@@ -110,16 +110,33 @@
     .fade-in { animation: fadeInUp 0.25s ease-out; }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-    /* --- PDF PRINT STYLES --- */
+/* --- VOUCHER MODAL & PRINT STYLES --- */
+    .voucher-print-area {
+        transition: background-color 0.3s, color 0.3s;
+    }
+    /* Adapts specifically to dark mode on screen */
+    [data-bs-theme="dark"] .voucher-print-area {
+        background-color: #0f172a;
+        color: #f8fafc;
+    }
+    [data-bs-theme="dark"] .voucher-print-area table { border-color: #334155 !important; }
+    [data-bs-theme="dark"] .voucher-print-area td { color: #f8fafc !important; }
+    [data-bs-theme="dark"] .voucher-header-bg { background-color: rgba(255, 255, 255, 0.05) !important; }
+    [data-bs-theme="dark"] .modal-content { border: 1px solid #1e293b; background-color: #0f172a; }
+
+    /* Forces white background and black text ONLY when printing/saving as PDF */
     @media print {
         body * { visibility: hidden; }
         #viewVoucherModal .modal-content, #viewVoucherModal .modal-content * { visibility: visible; }
         #viewVoucherModal .modal-content {
-            position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; background: white; color: black;
+            position: absolute; left: 0; top: 0; width: 100%; border: none !important; box-shadow: none !important; 
+            background: white !important; color: black !important;
         }
+        .voucher-print-area table { border-color: #dee2e6 !important; }
+        .voucher-print-area td { color: black !important; background-color: transparent !important; }
+        .voucher-header-bg { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         .no-print { display: none !important; }
-        .print-only { display: block !important; }
-        @page { size: A4; margin: 20mm; }
+        @page { size: A4; margin: 15mm; }
     }
 </style>
 
@@ -357,69 +374,85 @@
       </div>
     </div>
 
-    <!-- ON-DEMAND PDF VOUCHER MODAL -->
+<!-- ON-DEMAND PDF VOUCHER MODAL -->
     <div class="modal fade" id="viewVoucherModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content bg-white text-dark rounded-4">
+        <div class="modal-content rounded-4 shadow-lg">
           <div class="modal-header border-bottom-0 pb-0 no-print">
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
-          <div class="modal-body px-5 pt-3 pb-5">
+          <div class="modal-body px-5 pt-2 pb-5 voucher-print-area" id="printArea">
               
-              <!-- Printable Area Starts Here -->
-              <div class="text-center mb-4">
-                  <h2 class="fw-bold" style="color: #00d26a;">SoftCreation (Pvt) Ltd.</h2>
-                  <h5 class="text-muted fw-bold">PAYMENT VOUCHER</h5>
+              <!-- Enterprise Header -->
+              <div class="row mb-4 align-items-center">
+                  <div class="col-sm-7 d-flex align-items-center gap-3">
+                      <img src="https://i.imgur.com/MkCwuBP.png" height="50" alt="Logo">
+                      <h4 class="fw-bold mb-0" style="color: #00d26a;">SoftCreation (Pvt) Ltd.</h4>
+                  </div>
+                  <div class="col-sm-5 text-sm-end mt-3 mt-sm-0">
+                      <h3 class="fw-bold text-uppercase mb-1 tracking-wider text-muted" style="letter-spacing: 2px;">Payment Voucher</h3>
+                      <div class="badge fs-6" id="printStatus"></div>
+                  </div>
               </div>
 
-              <div class="row mb-4 border-bottom border-2 border-dark pb-3">
+              <!-- Metadata Block -->
+              <div class="row mb-4 p-3 rounded voucher-header-bg bg-light">
+                  <div class="col-sm-6">
+                      <p class="mb-1 text-uppercase small text-muted fw-bold">Voucher Details</p>
+                      <p class="mb-1"><strong>Voucher No:</strong> <span id="printVoucherNo" class="fw-bold" style="color: var(--primary);"></span></p>
+                      <p class="mb-0"><strong>Date:</strong> <span id="printDate"></span></p>
+                  </div>
+                  <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+                      <p class="mb-1 text-uppercase small text-muted fw-bold">Payment Summary</p>
+                      <p class="mb-0 fs-3 text-success fw-bold" id="printAmount"></p>
+                  </div>
+              </div>
+
+              <!-- Details Grid -->
+              <table class="table table-bordered border-secondary mb-4 align-middle">
+                  <tbody>
+                      <tr>
+                          <td class="w-25 text-muted fw-bold bg-light bg-opacity-25">Expense Type</td>
+                          <td class="w-75" id="printType"></td>
+                      </tr>
+                      <tr>
+                          <td class="text-muted fw-bold bg-light bg-opacity-25">Payment Method</td>
+                          <td id="printBank"></td>
+                      </tr>
+                      <tr>
+                          <td class="text-muted fw-bold bg-light bg-opacity-25">Description</td>
+                          <td id="printNote" style="min-height: 80px; display: block; border: none;"></td>
+                      </tr>
+                  </tbody>
+              </table>
+
+              <!-- Digital Audit Trail (Replaces Manual Signatures) -->
+              <div class="row mt-5 pt-3 border-top border-secondary border-opacity-50">
                   <div class="col-6">
-                      <p class="mb-1"><strong>Voucher No:</strong> <span id="printVoucherNo"></span></p>
-                      <p class="mb-1"><strong>Date:</strong> <span id="printDate"></span></p>
+                      <p class="text-muted small text-uppercase fw-bold mb-1">Prepared By (System User)</p>
+                      <p class="mb-0 fw-bold" id="printPreparedBy"></p>
                   </div>
                   <div class="col-6 text-end">
-                      <p class="mb-1"><strong>Status:</strong> <span id="printStatus" class="badge bg-success"></span></p>
-                      <p class="mb-1"><strong>Amount:</strong> <span id="printAmount" class="fs-5 fw-bold"></span></p>
-                  </div>
-              </div>
-
-              <div class="row mb-4">
-                  <div class="col-12">
-                      <p class="mb-2"><strong>Bank / Cash:</strong> <span id="printBank"></span></p>
-                      <p class="mb-2"><strong>Expense Type:</strong> <span id="printType"></span></p>
-                      <p class="mb-2"><strong>Description:</strong></p>
-                      <div class="p-3 border rounded bg-light" id="printNote" style="min-height: 80px;"></div>
-                  </div>
-              </div>
-
-              <div class="row mt-5 pt-5 text-center">
-                  <div class="col-4">
-                      <div class="border-top border-dark mx-3 pt-2">
-                          <strong>Prepared By</strong><br>
-                          <small class="text-muted" id="printPreparedBy"></small>
-                      </div>
-                  </div>
-                  <div class="col-4">
-                      <div class="border-top border-dark mx-3 pt-2">
-                          <strong>Checked By</strong><br>
-                          <small class="text-muted">&nbsp;</small>
-                      </div>
-                  </div>
-                  <div class="col-4">
-                      <div class="border-top border-dark mx-3 pt-2">
-                          <strong>Authorized By</strong><br>
-                          <small class="text-muted" id="printApprovedBy"></small>
-                      </div>
+                      <p class="text-muted small text-uppercase fw-bold mb-1">Digitally Approved By</p>
+                      <p class="mb-0 fw-bold text-success" id="printApprovedBy"></p>
+                      <small class="text-muted" id="printApprovedTime"></small>
                   </div>
               </div>
               
-              <div class="text-center mt-5 no-print" id="printBillLinks">
+              <!-- Disclaimer -->
+              <div class="text-center mt-5 pt-3">
+                  <p class="small text-muted fst-italic mb-0 border-top pt-2">This is a computer-generated document. No physical signature is required.</p>
+              </div>
+
+              <!-- Attached Bill Links (Hidden during PDF print) -->
+              <div class="mt-4 pt-3 border-top border-dashed no-print" id="printBillLinks">
                   <!-- Links generated dynamically here -->
               </div>
+              
           </div>
-          <div class="modal-footer bg-light no-print">
-            <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary fw-bold" onclick="window.print()"><i class="bi bi-printer"></i> Print / Save PDF</button>
+          <div class="modal-footer no-print border-top-0 bg-light bg-opacity-10">
+            <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close Window</button>
+            <button type="button" class="btn btn-primary fw-bold" onclick="window.print()"><i class="bi bi-file-earmark-pdf-fill"></i> Save as PDF</button>
           </div>
         </div>
       </div>
@@ -901,9 +934,15 @@
             const item = loadedData.find(x => x.voucherNo === voucherNo);
             if(!item) return;
 
+            // Fill standard data
             document.getElementById('printVoucherNo').innerText = item.voucherNo;
             document.getElementById('printDate').innerText = item.date;
-            document.getElementById('printStatus').innerText = item.status;
+            
+            // Format Status Badge
+            const statusEl = document.getElementById('printStatus');
+            statusEl.innerText = item.status;
+            statusEl.className = 'badge fs-6 ' + (item.status === 'APPROVED' ? 'bg-success' : (item.status === 'REJECTED' ? 'bg-danger' : 'bg-warning text-dark'));
+            
             document.getElementById('printAmount').innerText = formatCurrency(item.amount);
             document.getElementById('printBank').innerText = item.bank;
             
@@ -911,24 +950,29 @@
             document.getElementById('printType').innerText = `${item.type} ${empTag}`;
             document.getElementById('printNote').innerText = item.note || 'No description provided';
             
+            // Fill Digital Audit Trail
             document.getElementById('printPreparedBy').innerText = item.user;
             
-            // Show approver info if it was approved
             if (item.status === 'APPROVED' && item.approvedBy) {
-                document.getElementById('printApprovedBy').innerHTML = `${item.approvedBy}<br><span style="font-size: 0.6rem">${item.approvedTime}</span>`;
+                document.getElementById('printApprovedBy').innerHTML = `<i class="bi bi-check-circle-fill"></i> ${item.approvedBy}`;
+                document.getElementById('printApprovedTime').innerText = "Timestamp: " + item.approvedTime;
+            } else if (item.status === 'PENDING') {
+                document.getElementById('printApprovedBy').innerHTML = `<span class="text-warning"><i class="bi bi-hourglass-split"></i> Pending Approval</span>`;
+                document.getElementById('printApprovedTime').innerText = "";
             } else {
                 document.getElementById('printApprovedBy').innerText = "N/A";
+                document.getElementById('printApprovedTime').innerText = "";
             }
 
-            // Build links for print mode so they can be clicked if saved as PDF
-            let linksHtml = '';
+            // Build interactive button links for attached bills
+            let linksHtml = '<p class="text-muted fw-bold small mb-2 text-uppercase">Attached Receipts / Evidence</p>';
             if (item.billUrl && item.billUrl !== 'No Bill') {
                 const urls = item.billUrl.split(',');
                 urls.forEach((u, i) => {
-                    linksHtml += `<a href="${u.trim()}" target="_blank" class="me-3">Attached Bill ${i+1}</a>`;
+                    linksHtml += `<a href="${u.trim()}" target="_blank" class="btn btn-sm btn-outline-info me-2 mb-2"><i class="bi bi-box-arrow-up-right"></i> View Attachment ${i+1}</a>`;
                 });
             } else {
-                linksHtml = '<em>No Bills Attached</em>';
+                linksHtml += '<span class="text-muted small fst-italic">No Bills Attached to this voucher.</span>';
             }
             document.getElementById('printBillLinks').innerHTML = linksHtml;
 
