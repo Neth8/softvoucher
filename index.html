@@ -111,32 +111,43 @@
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 /* --- VOUCHER MODAL & PRINT STYLES --- */
-    .voucher-print-area {
-        transition: background-color 0.3s, color 0.3s;
-    }
-    /* Adapts specifically to dark mode on screen */
-    [data-bs-theme="dark"] .voucher-print-area {
-        background-color: #0f172a;
-        color: #f8fafc;
-    }
+    .voucher-print-area { transition: background-color 0.3s, color 0.3s; }
+    [data-bs-theme="dark"] .voucher-print-area { background-color: #0f172a; color: #f8fafc; }
     [data-bs-theme="dark"] .voucher-print-area table { border-color: #334155 !important; }
     [data-bs-theme="dark"] .voucher-print-area td { color: #f8fafc !important; }
     [data-bs-theme="dark"] .voucher-header-bg { background-color: rgba(255, 255, 255, 0.05) !important; }
     [data-bs-theme="dark"] .modal-content { border: 1px solid #1e293b; background-color: #0f172a; }
 
-    /* Forces white background and black text ONLY when printing/saving as PDF */
+    /* Bulletproof Print Rules */
     @media print {
-        body * { visibility: hidden; }
-        #viewVoucherModal .modal-content, #viewVoucherModal .modal-content * { visibility: visible; }
-        #viewVoucherModal .modal-content {
-            position: absolute; left: 0; top: 0; width: 100%; border: none !important; box-shadow: none !important; 
-            background: white !important; color: black !important;
+        body * { visibility: hidden !important; }
+        #viewVoucherModal, #viewVoucherModal * { visibility: visible !important; }
+        
+        #viewVoucherModal {
+            position: absolute !important; left: 0 !important; top: 0 !important;
+            margin: 0 !important; padding: 0 !important; width: 100% !important;
+            background: white !important;
         }
-        .voucher-print-area table { border-color: #dee2e6 !important; }
-        .voucher-print-area td { color: black !important; background-color: transparent !important; }
-        .voucher-header-bg { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        
+        #viewVoucherModal .modal-dialog { max-width: 100% !important; margin: 0 !important; transform: none !important; }
+        #viewVoucherModal .modal-content {
+            border: none !important; box-shadow: none !important; border-radius: 0 !important;
+            background: white !important; color: black !important; width: 100% !important;
+        }
+
+        .voucher-print-area table { border-color: #000 !important; }
+        .voucher-print-area td { color: black !important; background-color: transparent !important; border-color: #000 !important; }
+        .voucher-header-bg { background-color: #f8f9fa !important; border: 1px solid #dee2e6 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         .no-print { display: none !important; }
-        @page { size: A4; margin: 15mm; }
+        
+        /* Force Flexbox and Grid to stay side-by-side in PDF */
+        .d-flex { display: flex !important; }
+        .row { display: flex !important; flex-wrap: wrap !important; width: 100%; margin: 0 !important; }
+        .col-5 { flex: 0 0 41.666% !important; max-width: 41.666% !important; }
+        .col-6 { flex: 0 0 50% !important; max-width: 50% !important; }
+        .col-7 { flex: 0 0 58.333% !important; max-width: 58.333% !important; }
+
+        @page { size: A4; margin: 10mm; }
     }
 </style>
 
@@ -374,7 +385,7 @@
       </div>
     </div>
 
-<!-- ON-DEMAND PDF VOUCHER MODAL -->
+    <!-- ON-DEMAND PDF VOUCHER MODAL -->
     <div class="modal fade" id="viewVoucherModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content rounded-4 shadow-lg">
@@ -385,11 +396,11 @@
               
               <!-- Enterprise Header -->
               <div class="row mb-4 align-items-center">
-                  <div class="col-sm-7 d-flex align-items-center gap-3">
+                  <div class="col-7 d-flex align-items-center gap-3">
                       <img src="https://i.imgur.com/MkCwuBP.png" height="50" alt="Logo">
                       <h4 class="fw-bold mb-0" style="color: #00d26a;">SoftCreation (Pvt) Ltd.</h4>
                   </div>
-                  <div class="col-sm-5 text-sm-end mt-3 mt-sm-0">
+                  <div class="col-5 text-end">
                       <h3 class="fw-bold text-uppercase mb-1 tracking-wider text-muted" style="letter-spacing: 2px;">Payment Voucher</h3>
                       <div class="badge fs-6" id="printStatus"></div>
                   </div>
@@ -397,12 +408,12 @@
 
               <!-- Metadata Block -->
               <div class="row mb-4 p-3 rounded voucher-header-bg bg-light">
-                  <div class="col-sm-6">
+                  <div class="col-6">
                       <p class="mb-1 text-uppercase small text-muted fw-bold">Voucher Details</p>
                       <p class="mb-1"><strong>Voucher No:</strong> <span id="printVoucherNo" class="fw-bold" style="color: var(--primary);"></span></p>
                       <p class="mb-0"><strong>Date:</strong> <span id="printDate"></span></p>
                   </div>
-                  <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+                  <div class="col-6 text-end">
                       <p class="mb-1 text-uppercase small text-muted fw-bold">Payment Summary</p>
                       <p class="mb-0 fs-3 text-success fw-bold" id="printAmount"></p>
                   </div>
@@ -435,7 +446,7 @@
                   <div class="col-6 text-end">
                       <p class="text-muted small text-uppercase fw-bold mb-1">Digitally Approved By</p>
                       <p class="mb-0 fw-bold text-success" id="printApprovedBy"></p>
-                      <small class="text-muted" id="printApprovedTime"></small>
+                      <div class="text-muted small" id="printApprovedTime"></div>
                   </div>
               </div>
               
@@ -953,9 +964,13 @@
             // Fill Digital Audit Trail
             document.getElementById('printPreparedBy').innerText = item.user;
             
-            if (item.status === 'APPROVED' && item.approvedBy) {
-                document.getElementById('printApprovedBy').innerHTML = `<i class="bi bi-check-circle-fill"></i> ${item.approvedBy}`;
-                document.getElementById('printApprovedTime').innerText = "Timestamp: " + item.approvedTime;
+            // ✅ LEGACY DATA FIX: Handle old vouchers that were approved before today
+            if (item.status === 'APPROVED') {
+                const approver = item.approvedBy ? item.approvedBy : "System Admin (Legacy Record)";
+                const timeString = item.approvedTime ? `Timestamp: ${item.approvedTime}` : "Historical Approval";
+                
+                document.getElementById('printApprovedBy').innerHTML = `<i class="bi bi-check-circle-fill"></i> ${approver}`;
+                document.getElementById('printApprovedTime').innerText = timeString;
             } else if (item.status === 'PENDING') {
                 document.getElementById('printApprovedBy').innerHTML = `<span class="text-warning"><i class="bi bi-hourglass-split"></i> Pending Approval</span>`;
                 document.getElementById('printApprovedTime').innerText = "";
