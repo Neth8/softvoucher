@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoftCreation Voucher System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('softcreation_theme');
+            if (savedTheme) document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            else document.documentElement.setAttribute('data-bs-theme', 'dark');
+        })();
+    </script>
+<style>
+    :root { --primary: #00d26a; --sidebar-w: 260px; }
+
+    /* GLOBAL LOADER */
+    #global-loader {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(10px);
+        z-index: 9999; display: flex; align-items: center; justify-content: center;
+        opacity: 1; transition: opacity 0.3s ease;
+    }
+    #global-loader.d-none { display: none !important; opacity: 0; pointer-events: none; }
+    .loader-content {
+        background: rgba(15, 23, 42, 0.95); border: 1px solid #1e293b;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); border-radius: 16px;
+        padding: 2.5rem; max-width: 400px; width: 90%; text-align: center;
+    }
+    [data-bs-theme="light"] .loader-content { background: rgba(255, 255, 255, 0.98); border-color: #e2e8f0; }
+
+    /* THEME-SPECIFIC OVERRIDES */
+    [data-bs-theme="dark"] body { color: #f8fafc; }
+    [data-bs-theme="dark"] .card-custom { background-color: rgba(15, 23, 42, 0.98); border: 1px solid #1f2937; }
+    [data-bs-theme="dark"] #sidebar { background-color: #020617; border-right: 1px solid #111827; }
+    [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: #0f172a; border-color: #1e293b; color: #f9fafb; }
+    [data-bs-theme="dark"] .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 0.25rem rgba(0, 210, 106, 0.25); }
+    [data-bs-theme="dark"] .btn-outline-dark { color: #ffffff; border-color: rgba(255, 255, 255, 0.6); }
+    [data-bs-theme="dark"] .btn-outline-dark:hover { background-color: #ffffff; color: #000000; }
+
+    /* GLOBAL BACKGROUND & LAYOUT */
+    body {
+        background-color: #f9fafb;
+        background: radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 55%), radial-gradient(circle at bottom right, rgba(22,163,74,0.2), transparent 55%), linear-gradient(rgba(248,250,252,0.98), rgba(241,245,249,0.98)), url('https://i.imgur.com/istgVag.jpeg');
+        background-size: cover; background-position: center; background-attachment: fixed;
+        font-family: 'Segoe UI', system-ui, sans-serif; display: flex; height: 100vh; overflow: hidden;
+    }
+    [data-bs-theme="dark"] body {
+        background: radial-gradient(circle at top left, rgba(56,189,248,0.28), transparent 55%), radial-gradient(circle at bottom right, rgba(22,163,74,0.30), transparent 55%), linear-gradient(135deg, #020617, #020617), url('https://i.imgur.com/istgVag.jpeg');
+        background-size: cover; background-position: center; background-attachment: fixed;
+    }
+    body.fade-out-exit { opacity: 0; pointer-events: none; }
+
+    /* LOGIN OVERLAY + CARDS */
+    #login-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column;
+        background: radial-gradient(circle at top left, rgba(56,189,248,0.25), transparent 60%), radial-gradient(circle at bottom right, rgba(22,163,74,0.3), transparent 60%), linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.93)), url('https://i.imgur.com/istgVag.jpeg');
+        background-size: cover; background-position: center;
+    }
+    #login-card, #loading-card { backdrop-filter: blur(14px); background: rgba(15, 23, 42, 0.92); border-radius: 18px; border: 1px solid rgba(148, 163, 184, 0.3); box-shadow: 0 24px 60px rgba(15, 23, 42, 0.9), 0 0 0 1px rgba(15, 23, 42, 0.7); }
+    [data-bs-theme="light"] #login-card, [data-bs-theme="light"] #loading-card { background: rgba(255, 255, 255, 0.96); border: 1px solid rgba(148, 163, 184, 0.3); box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(148, 163, 184, 0.25); }
+
+    /* SIDEBAR */
+    #sidebar { width: var(--sidebar-w); background: linear-gradient(180deg, #020617, #020617); border-right: 1px solid rgba(15,23,42,0.85); display: flex; flex-direction: column; padding: 20px 18px; z-index: 10; backdrop-filter: blur(10px); color: #e5e7eb; box-shadow: 12px 0 45px rgba(15, 23, 42, 0.95); }
+    .nav-btn { text-align: left; padding: 11px 18px; margin-bottom: 8px; border-radius: 10px; border: none; background: transparent; color: #cbd5f5; font-weight: 600; display: flex; align-items: center; gap: 12px; transition: all 0.18s ease; width: 100%; font-size: 0.9rem; }
+    .nav-btn i { font-size: 1.1rem; color: #e5e7eb; }
+    .nav-btn:hover { background: rgba(148, 163, 184, 0.14); color: #f9fafb; }
+    .nav-btn:hover i { color: #ffffff; }
+    .nav-btn.active { background: linear-gradient(135deg, #00d26a, #10b981); color: #022c22; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.45); transform: translateY(-1px); }
+    .nav-btn.active i { color: #022c22; }
+    #sidebar .footer-text { font-size: 0.75rem; color: #64748b; text-align: center; margin-top: 10px; }
+
+    /* CARDS */
+    .card-custom { border: 1px solid rgba(148, 163, 184, 0.28); border-radius: 16px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.30); background: rgba(15,23,42,0.96); transition: all 0.22s ease; backdrop-filter: blur(12px); }
+    [data-bs-theme="light"] .card-custom { background: rgba(255,255,255,0.98); box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16); }
+    .card-custom:hover { transform: translateY(-2px); box-shadow: 0 20px 55px rgba(15, 23, 42, 0.40); }
+
+    /* BUTTONS */
+    .btn { border-radius: 999px; font-weight: 600; letter-spacing: 0.02em; transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, color 0.12s ease; }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(15, 23, 42, 0.35); }
+    .btn-success, .btn-primary { box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35); }
+    .btn-success:hover, .btn-primary:hover { box-shadow: 0 12px 28px rgba(16, 185, 129, 0.45); }
+
+    /* FORMS */
+    .form-label { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.7rem !important; color: #6b7280; }
+    [data-bs-theme="dark"] .form-label { color: #9ca3af; }
+    .form-control, .form-select { border-radius: 10px; }
+
+    /* STATUS */
+    .footer-text { font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 20px; }
+    .status-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 999px; display: inline-block; margin-bottom: 10px; }
+    .status-cache { background: #e2e8f0; color: #64748b; }
+    .status-live { background: #dcfce7; color: #166534; }
+
+    /* FILE UPLOADS */
+    .upload-box { width: 80px; height: 80px; border: 2px dashed #64748b; border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; color: #64748b; background: rgba(15, 23, 42, 0.5); position: relative; }
+    [data-bs-theme="light"] .upload-box { background: rgba(248, 250, 252, 0.85); }
+    .upload-box::before { content: "Click to upload"; position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 0.7rem; color: #94a3b8; }
+    .upload-box:hover { border-color: var(--primary); color: var(--primary); background: rgba(16, 185, 129, 0.1); }
+    .file-item { width: 80px; height: 80px; position: relative; border-radius: 10px; overflow: hidden; border: 1px solid #475569; background: #020617; }
+    .file-item img { width: 100%; height: 100%; object-fit: cover; }
+    .file-item .pdf-icon { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #0f172a; color: #f8fafc; font-size: 24px; }
+    .file-item .actions { position: absolute; top: 2px; right: 2px; display: flex; gap: 2px; }
+    .file-item .btn-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; border: none; color: white; }
+    .btn-remove { background: rgba(220, 38, 38, 0.9); }
+    .btn-replace { background: rgba(59, 130, 246, 0.9); }
+
+    .fade-in { animation: fadeInUp 0.25s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    /* --- PDF PRINT STYLES --- */
+    @media print {
+        body * { visibility: hidden; }
+        #viewVoucherModal .modal-content, #viewVoucherModal .modal-content * { visibility: visible; }
+        #viewVoucherModal .modal-content {
+            position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; background: white; color: black;
+        }
+        .no-print { display: none !important; }
+        .print-only { display: block !important; }
+        @page { size: A4; margin: 20mm; }
+    }
+</style>
+
+</head>
+<body>
+
+    <!-- GLOBAL LOADING SCREEN -->
+    <div id="global-loader" class="d-none">
+        <div class="loader-content">
+            <div class="spinner-border text-primary mb-3" style="width: 3.5rem; height: 3.5rem;" role="status"></div>
+            <h5 id="global-loader-text" class="fw-bold mb-1 text-white">Processing...</h5>
+            <small class="text-white-50">Please do not close this window.</small>
+        </div>
+    </div>
+
+    <div id="login-overlay">
+        <div class="position-absolute top-0 end-0 m-4">
+            <button class="btn btn-light rounded-circle shadow-sm" onclick="toggleTheme()" title="Switch Theme"><i class="bi bi-moon-stars-fill"></i></button>
+        </div>
+        
+        <div id="login-card" class="card p-5 text-center" style="width: 400px; border-radius: 16px;">
+            <div class="mb-4 d-flex justify-content-center">
+                <img src="https://i.imgur.com/MkCwuBP.png" height="45" onerror="this.style.display='none'">
+            </div>
+            <h3 class="fw-bold">Welcome Back</h3>
+            <p class="text-muted mb-4">SoftCreation Voucher System</p>
+            <div class="form-floating mb-3 text-start">
+                <input type="text" class="form-control" id="loginEmail" placeholder="Username or Email" onkeydown="if(event.key==='Enter') handleLogin()">
+                <label>Username or Email</label>
+            </div>
+            <button class="btn btn-success w-100 py-2 fw-bold" onclick="handleLogin()" style="background: var(--primary); border:none;">Secure Login</button>
+            <div id="loginError" class="text-danger mt-3 small"></div>
+        </div>
+
+        <div id="loading-card" class="card p-5 text-center d-none fade-in" style="width: 400px; border-radius: 16px;">
+            <div class="mb-4 mt-2 d-flex justify-content-center">
+                <div class="spinner-border text-success" style="width: 3.5rem; height: 3.5rem; color: var(--primary) !important;" role="status"></div>
+            </div>
+            <h4 class="fw-bold">Connecting...</h4>
+            <p class="text-muted mb-2">Loading secure database</p>
+        </div>
+
+        <div class="footer-text text-white-50 mt-4">© 2026 SoftCreation (Pvt) Ltd. All Rights Reserved.</div>
+    </div>
+
+    <div id="sidebar">
+        <div class="w-100 d-flex justify-content-center mb-5 mt-2">
+            <img src="https://i.imgur.com/MkCwuBP.png" height="35" onerror="this.style.display='none'" style="object-fit: contain;">
+        </div>
+        <button id="nav-form" class="nav-btn d-none" onclick="startNewVoucher()"><i class="bi bi-plus-square-fill"></i> New Voucher</button>
+        <button id="nav-history" class="nav-btn d-none" onclick="switchView('view-history')"><i class="bi bi-clock-history"></i> System History</button>
+        <button id="nav-approvals" class="nav-btn d-none" onclick="switchView('view-approvals')"><i class="bi bi-shield-check"></i> Approvals</button>
+        <button id="nav-audit" class="nav-btn d-none" onclick="switchView('view-audit')"><i class="bi bi-eye-fill"></i> Audit View</button>
+        <button id="nav-all-bills" class="nav-btn d-none" onclick="switchView('view-all-bills')"><i class="bi bi-collection-fill"></i> All Bills</button>
+        <button id="nav-settings" class="nav-btn mt-2 border-top pt-3 rounded-0" onclick="switchView('view-settings')"><i class="bi bi-gear-fill"></i> System Settings</button>
+        
+        <div class="mt-auto">
+            <div class="d-flex align-items-center gap-3 px-2 mb-3"><div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:32px; height:32px; font-size:12px;"><i class="bi bi-person-fill"></i></div><div style="font-size: 0.8rem; line-height: 1.2;"><div class="fw-bold" id="user-role-display">Role</div><div class="text-muted text-truncate" style="max-width: 140px;" id="user-email-display">email</div></div></div>
+            <div class="d-flex gap-2 mb-3"><button class="btn btn-outline-secondary w-50 btn-sm" onclick="toggleTheme()"><i class="bi bi-moon-stars"></i></button><button class="btn btn-outline-danger w-50 btn-sm" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button></div>
+            <div class="footer-text mt-0 mb-2">© 2026 SoftCreation.<br>All Rights Reserved.</div>
+        </div>
+    </div>
+
+    <div class="flex-grow-1 p-4 overflow-auto position-relative" id="main-content">
+        <div id="view-form" class="container-fluid d-none fade-in">
+            <div class="mx-auto" style="max-width: 800px;">
+                <div class="d-flex justify-content-between align-items-center mb-4"><h3 class="fw-bold m-0" id="form-title">🧾 Submit Voucher</h3><button class="btn btn-outline-secondary btn-sm" onclick="startNewVoucher()" title="Unlock Form"><i class="bi bi-arrow-clockwise"></i> Reset Form</button></div>
+                <div class="card card-custom p-4">
+                    <div class="row g-3">
+                        <div class="col-12"><label class="form-label small fw-bold text-muted">Voucher No</label><input type="text" class="form-control fw-bold text-primary bg-light" id="voucherNoDisplay" readonly value="Select date first..."></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold text-muted">Date</label><input type="date" class="form-control" id="date" onchange="generateLiveVoucherID()"></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold text-muted">Bank</label><select class="form-select" id="bank"><option value="" selected disabled>Select Bank...</option><option>People's Bank 226100130071423</option><option>BOC 92746436</option><option>Sampath bank 021510002668</option><option>CASH BANK</option><option>People's Bank New 012100110071423</option><option>Com Bank - 1000671993</option><option>NDB - 111000097345</option><option>COM MMA - 2000272029</option><option>SAMPATH MMA - 121515001498</option></select></div>
+                        
+                        <div class="col-md-6"><label class="form-label small fw-bold text-muted">Type</label><select class="form-select" id="type" onchange="handleTypeChange()"><option>Food</option><option>Travel</option><option>Supplies</option><option>Welfare</option><option>Utilities</option><option>Salary</option><option>Commission</option><option>Other</option></select></div>
+                        
+                        <div class="col-md-6 d-none" id="other-type-container"><label class="form-label small fw-bold text-muted">Specify Other</label><input type="text" class="form-control" id="other-type-input"></div>
+                        
+                        <div class="col-md-6 d-none" id="emp-no-container"><label class="form-label small fw-bold text-muted">Employee No.</label><input type="text" class="form-control" id="employee-no-input" placeholder="e.g. EMP001"></div>
+
+                        <div class="col-12"><label class="form-label small fw-bold text-muted">Amount (LKR)</label><div class="input-group"><span class="input-group-text bg-transparent">Rs.</span><input type="number" class="form-control" id="amount"></div></div>
+                        <div class="col-12"><label class="form-label small fw-bold text-muted">Note</label><textarea class="form-control" id="note" rows="2"></textarea></div>
+                        
+                        <div class="col-12" id="file-container">
+                            <label class="form-label small fw-bold text-muted">Attach Bills (Image/PDF)</label>
+                            <div class="d-flex flex-wrap gap-2" id="preview-container">
+                                <div class="upload-box" onclick="document.getElementById('hidden-file-input').click()"><i class="bi bi-plus-lg fs-3"></i></div>
+                            </div>
+                            <input type="file" id="hidden-file-input" class="d-none" accept="image/*,application/pdf" onchange="handleFileSelect(this)">
+                            <input type="file" id="replace-file-input" class="d-none" accept="image/*,application/pdf" onchange="handleReplaceSelect(this)">
+                            <div class="form-text">Click + to add multiple bills.</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-success w-100 mt-4 py-2 fw-bold" onclick="submitVoucher()" id="submitBtn" style="background:var(--primary); border:none;">Submit for Approval</button>
+                    <button class="btn btn-secondary w-100 mt-2 py-2 fw-bold d-none" id="cancelEditBtn" onclick="startNewVoucher()">Cancel Edit</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-settings" class="container-fluid d-none fade-in">
+            <h3 class="fw-bold mb-4">⚙️ System Settings</h3>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card card-custom p-4 h-100">
+                        <h5 class="fw-bold"><i class="bi bi-server"></i> Supabase Database Health</h5>
+                        <div class="mt-4 text-center">
+                            <div class="display-4 fw-bold text-primary" id="row-count-display">...</div>
+                            <div class="text-muted">Total Vouchers Stored</div>
+                        </div>
+                        <div class="mt-auto pt-4 text-center">
+                            <span class="badge bg-success mb-2 px-3 py-2">System Healthy</span>
+                            <p class="small text-muted mb-0">Connected to Supabase PostgreSQL.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-cloud-check display-1 text-muted"></i>
+                            <h5 class="mt-3">API Connected</h5>
+                            <span class="badge bg-primary mt-1">Status: Online</span>
+                        </div>
+                        <div id="maintenance-control" class="d-none border-top pt-4 mt-auto">
+                            <div class="form-check form-switch d-flex justify-content-center align-items-center gap-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="maintenanceSwitch" onchange="toggleMaintenance()">
+                                <label class="form-check-label fw-bold" for="maintenanceSwitch">Maintenance Mode</label>
+                            </div>
+                            <p class="text-center small text-muted mt-2 mb-0">When ON, only System Admin can log in.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 mt-2">
+                    <div class="card card-custom p-4">
+                        <h5 class="fw-bold mb-4"><i class="bi bi-file-earmark-arrow-down"></i> Data Management & Exports</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6 border-end">
+                                <label class="form-label fw-bold small text-muted">Database Backup</label>
+                                <p class="small mb-3 text-muted">Download the entire voucher history as an Excel-friendly CSV file.</p>
+                                <button class="btn btn-outline-success w-100 fw-bold" id="csvBtn" onclick="downloadCSV()">
+                                    <i class="bi bi-filetype-csv"></i> Download Full Database (CSV)
+                                </button>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Monthly Summary Report</label>
+                                <p class="small mb-2 text-muted">Generate a PDF summary of all APPROVED vouchers for a specific month.</p>
+                                <div class="input-group">
+                                    <input type="month" class="form-control" id="reportMonth">
+                                    <button class="btn btn-primary fw-bold" id="pdfBtn" onclick="generateReport()">
+                                        <i class="bi bi-file-pdf"></i> Generate PDF
+                                    </button>
+                                </div>
+                                <div id="reportLink" class="mt-2 text-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-approvals" class="container-fluid d-none fade-in"><div class="d-flex justify-content-between align-items-center mb-4"><h3 class="fw-bold">🛡️ Approvals</h3><div class="d-flex gap-2"><button class="btn btn-success btn-sm d-none" id="bulk-approve-btn" onclick="processBulk()">Approve Selected</button><button class="btn btn-outline-secondary btn-sm" onclick="loadPending()">Refresh</button></div></div><div id="status-approvals"></div><div id="pending-list" class="row g-3"></div></div>
+        
+        <div id="view-history" class="container-fluid d-none fade-in">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">🕘 System History</h3>
+                <div class="d-flex gap-2">
+                    <select id="history-filter" class="form-select form-select-sm" onchange="filterHistory()" style="min-width: 120px;">
+                        <option value="ALL">All Status</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REJECTED">Rejected</option>
+                    </select>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="loadMyHistory()">Refresh</button>
+                </div>
+            </div>
+            <div id="status-history"></div>
+            <div id="history-list" class="row g-3"></div>
+        </div>
+        
+        <div id="view-audit" class="container-fluid d-none fade-in"><div class="d-flex justify-content-between align-items-center mb-4"><h3 class="fw-bold">📋 Audit Log</h3><button class="btn btn-outline-secondary btn-sm" onclick="loadAudit()">Refresh</button></div><div id="status-audit"></div><div id="audit-list" class="row g-3"></div></div>
+        
+        <div id="view-all-bills" class="container-fluid d-none fade-in">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">🗂️ All Bills Repository</h3>
+            </div>
+            <div class="card card-custom p-3 mb-4">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-2">
+                        <label class="small fw-bold text-muted">Status</label>
+                        <select id="all-bills-filter" class="form-select" onchange="filterAllBills()">
+                            <option value="ALL">All Status</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="APPROVED">Approved</option>
+                            <option value="REJECTED">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted">Search by Voucher No</label>
+                        <input type="text" class="form-control" id="searchVoucherInput" placeholder="e.g. 202601" onkeydown="if(event.key==='Enter') executeCombinedSearch()">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted">Search by Date</label>
+                        <input type="date" class="form-control" id="searchDate">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100 fw-bold" onclick="executeCombinedSearch()">Search</button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" onclick="clearAllBillFilters()">Clear All</button>
+                    </div>
+                </div>
+            </div>
+            <div id="status-all-bills"></div>
+            <div id="all-bills-list" class="row g-3"></div>
+        </div>
+
+    <!-- REJECT MODAL -->
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Reject Voucher</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <label class="form-label">Reason for Rejection:</label>
+            <textarea id="rejectReasonInput" class="form-control" rows="3" placeholder="Enter reason..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" onclick="submitRejection()">Confirm Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ON-DEMAND PDF VOUCHER MODAL -->
+    <div class="modal fade" id="viewVoucherModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-white text-dark rounded-4">
+          <div class="modal-header border-bottom-0 pb-0 no-print">
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body px-5 pt-3 pb-5">
+              
+              <!-- Printable Area Starts Here -->
+              <div class="text-center mb-4">
+                  <h2 class="fw-bold" style="color: #00d26a;">SoftCreation (Pvt) Ltd.</h2>
+                  <h5 class="text-muted fw-bold">PAYMENT VOUCHER</h5>
+              </div>
+
+              <div class="row mb-4 border-bottom border-2 border-dark pb-3">
+                  <div class="col-6">
+                      <p class="mb-1"><strong>Voucher No:</strong> <span id="printVoucherNo"></span></p>
+                      <p class="mb-1"><strong>Date:</strong> <span id="printDate"></span></p>
+                  </div>
+                  <div class="col-6 text-end">
+                      <p class="mb-1"><strong>Status:</strong> <span id="printStatus" class="badge bg-success"></span></p>
+                      <p class="mb-1"><strong>Amount:</strong> <span id="printAmount" class="fs-5 fw-bold"></span></p>
+                  </div>
+              </div>
+
+              <div class="row mb-4">
+                  <div class="col-12">
+                      <p class="mb-2"><strong>Bank / Cash:</strong> <span id="printBank"></span></p>
+                      <p class="mb-2"><strong>Expense Type:</strong> <span id="printType"></span></p>
+                      <p class="mb-2"><strong>Description:</strong></p>
+                      <div class="p-3 border rounded bg-light" id="printNote" style="min-height: 80px;"></div>
+                  </div>
+              </div>
+
+              <div class="row mt-5 pt-5 text-center">
+                  <div class="col-4">
+                      <div class="border-top border-dark mx-3 pt-2">
+                          <strong>Prepared By</strong><br>
+                          <small class="text-muted" id="printPreparedBy"></small>
+                      </div>
+                  </div>
+                  <div class="col-4">
+                      <div class="border-top border-dark mx-3 pt-2">
+                          <strong>Checked By</strong><br>
+                          <small class="text-muted">&nbsp;</small>
+                      </div>
+                  </div>
+                  <div class="col-4">
+                      <div class="border-top border-dark mx-3 pt-2">
+                          <strong>Authorized By</strong><br>
+                          <small class="text-muted" id="printApprovedBy"></small>
+                      </div>
+                  </div>
+              </div>
+              
+              <div class="text-center mt-5 no-print" id="printBillLinks">
+                  <!-- Links generated dynamically here -->
+              </div>
+          </div>
+          <div class="modal-footer bg-light no-print">
+            <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary fw-bold" onclick="window.print()"><i class="bi bi-printer"></i> Print / Save PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ✅ 1. REPLACE THIS URL WITH YOUR NEW APPS SCRIPT DEPLOYMENT URL
+        const API_URL = "https://script.google.com/macros/s/AKfycbwR3axAc9dubFp346fEuiePwX1okb1-VI9uIl2-lC9A_RbB32vOBriBWiT1gR6acuUC/exec"; 
+  
+        let CURRENT_USER = ""; 
+        let EDIT_MODE = false; 
+        let ORIGINAL_VOUCHER_NO = "";
+        let ORIGINAL_DATE = "";
+        let SELECTED_FILES = [];
+        let REPLACE_INDEX = -1;
+        let tempRejectData = null;
+        let rejectModalObj = null; 
+        let viewVoucherModalObj = null;
+
+        // --- PAGINATION VARIABLES ---
+        let loadedData = [];       
+        let filteredData = [];     
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 10; 
+        let currentRenderFn = null; 
+        let currentContainer = "";
+        let sequenceCache = {};
+
+        function openExternalLink(url) { if(url && url.includes('http')) window.open(url, '_blank'); else alert("URL not configured!"); }
+        function toggleTheme() { const h = document.documentElement; const n = h.getAttribute('data-bs-theme')==='dark'?'light':'dark'; h.setAttribute('data-bs-theme',n); localStorage.setItem('softcreation_theme',n); }
+
+        function showGlobalLoader(msg) {
+            document.getElementById('global-loader-text').innerText = msg;
+            document.getElementById('global-loader').classList.remove('d-none');
+        }
+        function hideGlobalLoader() {
+            document.getElementById('global-loader').classList.add('d-none');
+        }
+
+        function safeArg(str) {
+            if (str === null || str === undefined) return '';
+            return str.toString().replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/(\r\n|\n|\r)/g, " ");
+        }
+
+        function handleTypeChange() { 
+            const e = document.getElementById('type').value; 
+            const otherCont = document.getElementById('other-type-container'); 
+            const empCont = document.getElementById('emp-no-container');
+            if(e === 'Other') { otherCont.classList.remove('d-none'); empCont.classList.add('d-none'); }
+            else if(e === 'Salary' || e === 'Commission') { otherCont.classList.add('d-none'); empCont.classList.remove('d-none'); }
+            else { otherCont.classList.add('d-none'); empCont.classList.add('d-none'); }
+        }
+
+        function handleLogin() {
+            const err = document.getElementById('loginError');
+            let input = document.getElementById('loginEmail').value.trim().toLowerCase();
+            if(!input) { err.innerText = "Please enter username"; return; }
+
+            document.getElementById('login-card').classList.add('d-none');
+            document.getElementById('loading-card').classList.remove('d-none');
+            err.innerText = ""; 
+
+            fetch(API_URL + "?action=login&email=" + encodeURIComponent(input))
+            .then(r => r.json())
+            .then(d => {
+                if (d.status === "Error") { showLoginError(d.message); return; }
+                const user = d.data.user;
+                const maintStatus = d.data.maintenance;
+                const email = user.email;
+                const role = user.role;
+
+                let showForm = false, showApprovals = false, showAudit = false, showAllBills = false;
+
+                if (role === "Owner") {
+                  showForm = true; showApprovals = true; showAudit = true; showAllBills = true;
+                } else if (role === "Admin") {
+                  showForm = true; showAllBills = true;
+                  if (email === "madumali.softcreation@gmail.com") { showApprovals = true; }
+                } else if (role === "CFO") {
+                  showForm = true; showApprovals = true; showAllBills = true;
+                } else if (role === "CEO") {
+                  showApprovals = true; showAllBills = true;
+                } else if (role === "Auditor") {
+                  showAudit = true; showAllBills = true;
+                } else {
+                  showLoginError("Role not configured."); return;
+                }
+
+                if (role !== "Owner" && maintStatus === "ON") {
+                    showLoginError("<strong class='d-block text-warning mb-2'>System Under Maintenance</strong>Please try again later.");
+                } else { 
+                    proceedLogin(email, role, showForm, showApprovals, showAudit, showAllBills); 
+                }
+            }).catch(e => {
+                showLoginError("Connection Error or Invalid Details");
+            });
+        }
+
+        function showLoginError(msg) {
+            document.getElementById('loading-card').classList.add('d-none');
+            document.getElementById('login-card').classList.remove('d-none');
+            document.getElementById('loginError').innerHTML = msg;
+        }
+
+        function proceedLogin(email, role, showForm, showApprovals, showAudit, showAllBills) {
+            CURRENT_USER = email;
+            document.getElementById('login-overlay').classList.add('d-none');
+            document.getElementById('user-role-display').innerText = role;
+            document.getElementById('user-email-display').innerText = email;
+
+            if(showForm) { document.getElementById('nav-form').classList.remove('d-none'); document.getElementById('nav-history').classList.remove('d-none'); startNewVoucher(); }
+            if(showApprovals) document.getElementById('nav-approvals').classList.remove('d-none');
+            if(showAudit) document.getElementById('nav-audit').classList.remove('d-none');
+            if(showAllBills) document.getElementById('nav-all-bills').classList.remove('d-none'); 
+            
+            document.getElementById('nav-settings').classList.remove('d-none');
+            if (role === "Owner") { document.getElementById('maintenance-control').classList.remove('d-none'); checkMaintenanceToggle(); }
+
+            if(showForm) switchView('view-form'); 
+            else if(showApprovals) switchView('view-approvals');
+            else if(showAudit) switchView('view-audit');
+            else switchView('view-all-bills');
+        }
+
+        function checkMaintenanceToggle() {
+            fetch(API_URL + "?action=getMaintenanceStatus").then(r=>r.json()).then(d=>{ document.getElementById('maintenanceSwitch').checked = (d.data === "ON"); });
+        }
+        function toggleMaintenance() {
+            const status = document.getElementById('maintenanceSwitch').checked ? "ON" : "OFF";
+            fetch(API_URL, { method: "POST", body: JSON.stringify({action: "TOGGLE_MAINTENANCE", status: status, userEmail: CURRENT_USER}) }).then(r=>r.json()).then(d=>{ alert(d.message); });
+        }
+
+        function switchView(id) {
+            ['view-form', 'view-approvals', 'view-history', 'view-audit', 'view-all-bills', 'view-settings'].forEach(v => document.getElementById(v).classList.add('d-none'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.remove('d-none'); document.getElementById(id).classList.add('fade-in');
+            if(id==='view-form') document.getElementById('nav-form').classList.add('active');
+            if(id==='view-approvals') { document.getElementById('nav-approvals').classList.add('active'); loadPending(); }
+            if(id==='view-history') { document.getElementById('nav-history').classList.add('active'); loadMyHistory(); }
+            if(id==='view-audit') { document.getElementById('nav-audit').classList.add('active'); loadAudit(); }
+            if(id==='view-all-bills') { document.getElementById('nav-all-bills').classList.add('active'); loadAllBills(); }
+            if(id==='view-settings') { document.getElementById('nav-settings').classList.add('active'); loadSettings(); }
+        }
+
+        function handleFileSelect(input) { if (input.files && input.files[0]) { SELECTED_FILES.push({ isExisting: false, data: input.files[0] }); renderPreviews(); } input.value = ""; }
+        function triggerReplace(index) { REPLACE_INDEX = index; document.getElementById('replace-file-input').click(); }
+        function handleReplaceSelect(input) { if (input.files && input.files[0]) { SELECTED_FILES[REPLACE_INDEX] = { isExisting: false, data: input.files[0] }; renderPreviews(); } input.value = ""; }
+
+        function renderPreviews() {
+            const container = document.getElementById('preview-container');
+            const uploadBtn = container.querySelector('.upload-box');
+            container.innerHTML = ''; 
+            SELECTED_FILES.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'file-item fade-in';
+                let src = "", isPdf = false;
+                if (item.isExisting) { src = item.data; isPdf = src.toLowerCase().includes(".pdf"); } 
+                else { src = URL.createObjectURL(item.data); isPdf = item.data.type === "application/pdf"; }
+                const content = isPdf ? `<div class="pdf-icon"><i class="bi bi-file-earmark-pdf"></i></div>` : `<img src="${src}">`;
+                div.innerHTML = `${content}<div class="actions"><button class="btn-icon btn-replace" onclick="triggerReplace(${index})"><i class="bi bi-arrow-repeat"></i></button><button class="btn-icon btn-remove" onclick="removeFile(${index})">×</button></div>`;
+                container.appendChild(div);
+            });
+            container.appendChild(uploadBtn);
+        }
+        function removeFile(index) { SELECTED_FILES.splice(index, 1); renderPreviews(); }
+        
+        function getBillButtons(urlStr) {
+            if (!urlStr || urlStr === 'No Bill') return '<span class="text-muted small">No Bill</span>';
+            const urls = urlStr.split(',');
+            if (urls.length === 1) return `<button class="btn btn-sm btn-outline-primary w-100 mb-1" onclick="window.open('${urls[0].trim()}', '_blank')">Bill 1</button>`;
+            return urls.map((u, i) => `<button class="btn btn-sm btn-outline-primary w-100 mb-1" onclick="window.open('${u.trim()}', '_blank')">Bill ${i+1}</button>`).join('');
+        }
+
+        function startNewVoucher() {
+            EDIT_MODE = false; SELECTED_FILES = []; renderPreviews();
+            document.getElementById('form-title').innerText = "🧾 Submit Voucher";
+            document.getElementById('submitBtn').innerText = "Submit for Approval";
+            document.getElementById('cancelEditBtn').classList.add('d-none');
+            document.getElementById('file-container').classList.remove('d-none'); 
+            document.querySelector('#file-container label').innerText = "Attach Bills (Image/PDF)";
+            document.getElementById('submitBtn').disabled = false;
+            let inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(el => el.disabled = false);
+            document.getElementById('date').value = ""; 
+            document.getElementById('bank').value = "";
+            document.getElementById('type').value = "Food";
+            document.getElementById('amount').value = "";
+            document.getElementById('note').value = "";
+            document.getElementById('employee-no-input').value = "";
+            document.getElementById('other-type-container').classList.add('d-none');
+            document.getElementById('emp-no-container').classList.add('d-none');
+            document.getElementById('voucherNoDisplay').value = "Select date first...";
+            setTimeout(() => { document.getElementById('date').focus(); }, 100);
+            switchView('view-form');
+        }
+
+        function generateLiveVoucherID() {
+            const date = document.getElementById('date').value;
+            if(!date) { document.getElementById('voucherNoDisplay').value = "Select date first..."; return; }
+            if (EDIT_MODE && date === ORIGINAL_DATE) { document.getElementById('voucherNoDisplay').value = ORIGINAL_VOUCHER_NO; return; }
+            
+            const dateParts = date.split("-"); 
+            const prefix = `${dateParts[0]}${dateParts[1]}`;
+
+            if (sequenceCache[prefix]) {
+                const count = sequenceCache[prefix].toString().padStart(2, '0');
+                document.getElementById('voucherNoDisplay').value = `${prefix}${count}`;
+                return;
+            }
+
+            document.getElementById('voucherNoDisplay').value = "Calculating...";
+            
+            fetch(API_URL + "?action=getNextSequence&date=" + date)
+            .then(r => r.json())
+            .then(d => {
+                if (d.status === "Success") {
+                    sequenceCache[prefix] = d.data; 
+                    const count = d.data.toString().padStart(2, '0');
+                    document.getElementById('voucherNoDisplay').value = `${prefix}${count}`;
+                } else {
+                    document.getElementById('voucherNoDisplay').value = "Error: " + d.message;
+                }
+            })
+            .catch(e => { 
+                console.error(e); 
+                document.getElementById('voucherNoDisplay').value = "Script/Network Error"; 
+            });
+        }
+
+        function loadEdit(voucherNo, date, type, bank, amount, note, billUrls, employeeNo) {
+            EDIT_MODE = true; 
+            
+            let decVoucher = unescape(voucherNo);
+            let decDate = unescape(date);
+            let decType = unescape(type); 
+            let decBank = unescape(bank);
+            let decAmount = unescape(amount);
+            let decNote = unescape(note);
+            let decBills = unescape(billUrls);
+            let decEmp = unescape(employeeNo || '');
+
+            ORIGINAL_VOUCHER_NO = decVoucher;
+            ORIGINAL_DATE = decDate;
+            
+            SELECTED_FILES = [];
+            if(decBills && decBills !== 'No Bill') { 
+                decBills.split(',').forEach(url => { SELECTED_FILES.push({ isExisting: true, data: url.trim() }); }); 
+            }
+            renderPreviews();
+
+            document.getElementById('form-title').innerText = "✏️ Edit Voucher";
+            document.getElementById('submitBtn').innerText = "Update Voucher";
+            document.getElementById('cancelEditBtn').classList.remove('d-none');
+            document.getElementById('file-container').classList.remove('d-none'); 
+            document.querySelector('#file-container label').innerText = "Manage Bills";
+            
+            document.getElementById('voucherNoDisplay').value = decVoucher;
+            document.getElementById('date').value = decDate;
+            document.getElementById('bank').value = decBank;
+            document.getElementById('amount').value = decAmount;
+            document.getElementById('note').value = decNote;
+            
+            const typeSelect = document.getElementById('type');
+            let found = false;
+            for(let i=0; i<typeSelect.options.length; i++){ 
+                if(typeSelect.options[i].value === decType) { 
+                    typeSelect.selectedIndex = i; 
+                    found = true; 
+                    break; 
+                } 
+            }
+            
+            if(!found) { 
+                typeSelect.value = "Other"; 
+                document.getElementById('other-type-input').value = decType; 
+            }
+            
+            if(decType === "Salary" || decType === "Commission") { 
+                document.getElementById('emp-no-container').classList.remove('d-none'); 
+                document.getElementById('employee-no-input').value = decEmp;
+            } else { 
+                document.getElementById('emp-no-container').classList.add('d-none'); 
+            }
+            
+            handleTypeChange(); 
+            switchView('view-form');
+        }
+
+        function submitVoucher() {
+            if(!navigator.onLine) { alert("No Internet!"); return; }
+            const btn = document.getElementById('submitBtn');
+            let type = document.getElementById('type').value;
+            let otherType = document.getElementById('other-type-input').value;
+            if(type==='Other') type = otherType.trim() || "Other";
+            
+            if(!document.getElementById('bank').value) { alert("Select Bank"); return; }
+            if(!document.getElementById('amount').value) { alert("Enter Amount"); return; }
+            
+            const empNo = document.getElementById('employee-no-input').value.trim();
+            if((type === 'Salary' || type === 'Commission') && !empNo) { alert("Please enter Employee No."); return; }
+
+            const vNo = document.getElementById('voucherNoDisplay').value;
+            if (!EDIT_MODE && (vNo === "Select date first..." || vNo === "Calculating...")) { alert("Wait for Voucher ID."); return; }
+
+            btn.disabled = true; btn.innerText = "Processing...";
+            
+            const keepUrls = SELECTED_FILES.filter(i => i.isExisting).map(i => i.data);
+            const newFiles = SELECTED_FILES.filter(i => !i.isExisting).map(i => i.data);
+
+            const payload = { 
+                action: EDIT_MODE ? "EDIT" : "SUBMIT", 
+                voucherNo: vNo, 
+                originalVoucherNo: ORIGINAL_VOUCHER_NO,
+                userEmail: CURRENT_USER, 
+                date: document.getElementById('date').value, 
+                type: type, 
+                bank: document.getElementById('bank').value, 
+                amount: document.getElementById('amount').value, 
+                note: document.getElementById('note').value, 
+                employeeNo: empNo, 
+                keepUrls: keepUrls,
+                files: []
+            };
+            
+            const send = () => {
+                showGlobalLoader("Encrypting and Uploading Bills... This usually takes 3-5 seconds.");
+                fetch(API_URL,{method:"POST", body:JSON.stringify(payload)}).then(r=>r.json()).then(d=>{ 
+                    hideGlobalLoader();
+                    alert(d.message); 
+                    if(d.status==="Success") {
+                        sequenceCache = {}; 
+                        startNewVoucher(); 
+                    } else { 
+                        btn.disabled=false; btn.innerText = EDIT_MODE ? "Update Voucher" : "Submit for Approval"; 
+                    }
+                }).catch(e=>{ 
+                    hideGlobalLoader();
+                    alert("Error: "+e.message); 
+                    btn.disabled=false; btn.innerText = EDIT_MODE ? "Update Voucher" : "Submit for Approval"; 
+                });
+            };
+
+            if(newFiles.length > 0) {
+                let promises = [];
+                newFiles.forEach(file => { promises.push(new Promise((resolve) => { processFile(file, (d, m, n) => resolve({data: d, mime: m, name: n})); })); });
+                Promise.all(promises).then(results => { payload.files = results; send(); });
+            } else { send(); }
+        }
+
+        function formatCurrency(amount) { return "Rs. " + Number(amount).toLocaleString('en-LK', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+        function processFile(f, cb) { const r=new FileReader(); r.onload=e=>{ if(f.type==="application/pdf") cb(e.target.result.split(',')[1],f.type,f.name); else if(f.type.startsWith("image/")){ const i=new Image(); i.onload=()=>{ const c=document.createElement('canvas'), x=c.getContext('2d'), M=1000; let w=i.width, h=i.height; if(w>h){if(w>M){h*=M/w;w=M}}else{if(h>M){w*=M/h;h=M}} c.width=w; c.height=h; x.drawImage(i,0,0,w,h); cb(c.toDataURL('image/jpeg',0.7).split(',')[1],"image/jpeg",f.name); }; i.src=e.target.result; } else alert("Use PDF or Image."); }; r.readAsDataURL(f); }
+
+        function loadPending() { fetchList("getPending", "pending-list", renderCard, "CACHE_PENDING", "status-approvals"); }
+        function loadMyHistory() { 
+            document.getElementById('history-filter').value = 'ALL'; 
+            fetchList("getAllVouchers", "history-list", renderHistoryCard, "CACHE_HISTORY", "status-history"); 
+        }
+        function loadAudit() { fetchList("getAllVouchers", "audit-list", renderAuditCard, "CACHE_AUDIT", "status-audit"); }
+        function loadAllBills() { clearAllBillFilters(); }
+
+        function clearAllBillFilters() {
+            document.getElementById('all-bills-filter').value = 'ALL';
+            document.getElementById('searchDate').value = ""; 
+            document.getElementById('searchVoucherInput').value = ""; 
+            fetchList("getAllVouchers", "all-bills-list", renderAuditCard, "CACHE_ALL", "status-all-bills"); 
+        }
+
+        function executeCombinedSearch() {
+            const voucherInput = document.getElementById('searchVoucherInput').value.trim();
+            const dateInput = document.getElementById('searchDate').value;
+            if (voucherInput) searchBillsByVoucher(voucherInput);
+            else if (dateInput) searchBillsByDate(dateInput);
+            else alert("Please enter a Voucher Number or select a Date to query.");
+        }
+
+        function searchBillsByDate(date) {
+            currentContainer = "all-bills-list"; currentRenderFn = renderAuditCard;
+            document.getElementById("status-all-bills").innerHTML = ""; 
+            document.getElementById("all-bills-list").innerHTML='<div class="col-12 text-center text-muted"><div class="spinner-border text-primary mb-2"></div>Searching Entire Database by Date...</div>';
+            fetch(API_URL+"?action=searchByDate&date="+date).then(r=>r.json()).then(j=>{
+                loadedData = j.data || [];
+                const filterVal = document.getElementById('all-bills-filter').value;
+                filteredData = (filterVal === 'ALL') ? [...loadedData] : loadedData.filter(item => item.status === filterVal);
+                currentPage = 1; renderPage(); 
+            });
+        }
+
+        function searchBillsByVoucher(voucherNo) {
+            currentContainer = "all-bills-list"; currentRenderFn = renderAuditCard;
+            document.getElementById("status-all-bills").innerHTML = ""; 
+            document.getElementById("all-bills-list").innerHTML='<div class="col-12 text-center text-muted"><div class="spinner-border text-primary mb-2"></div>Searching Entire Database by Voucher Number...</div>';
+            fetch(API_URL+"?action=searchByVoucher&voucherNo="+encodeURIComponent(voucherNo)).then(r=>r.json()).then(j=>{
+                loadedData = j.data || [];
+                const filterVal = document.getElementById('all-bills-filter').value;
+                filteredData = (filterVal === 'ALL') ? [...loadedData] : loadedData.filter(item => item.status === filterVal);
+                currentPage = 1; renderPage(); 
+            });
+        }
+
+        function filterAllBills() {
+            const filterVal = document.getElementById('all-bills-filter').value;
+            if (filterVal === 'ALL') filteredData = [...loadedData];
+            else filteredData = loadedData.filter(item => item.status === filterVal);
+            currentPage = 1; renderPage();
+        }
+
+        function fetchList(action, divId, renderFn, cacheKey, statusId) {
+            currentContainer = divId; currentRenderFn = renderFn;
+            const container = document.getElementById(divId); const statusBox = document.getElementById(statusId);
+            
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                loadedData = JSON.parse(cached); filteredData = [...loadedData]; currentPage = 1;
+                statusBox.innerHTML = '<span class="status-badge status-cache">Loaded from Cache</span>'; 
+                renderPage();
+            } else { 
+                container.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary mb-3"></div></div>'; 
+            }
+
+            fetch(API_URL + "?action=" + action).then(r => r.json()).then(j => {
+                if (j.data) {
+                    localStorage.setItem(cacheKey, JSON.stringify(j.data)); 
+                    loadedData = j.data;
+                    
+                    if (divId === 'history-list') {
+                        const filterVal = document.getElementById('history-filter').value;
+                        filteredData = (filterVal === 'ALL') ? [...loadedData] : loadedData.filter(item => item.status === filterVal);
+                    } else if (divId === 'all-bills-list') {
+                        const filterVal = document.getElementById('all-bills-filter').value;
+                        filteredData = (filterVal === 'ALL') ? [...loadedData] : loadedData.filter(item => item.status === filterVal);
+                    } else {
+                        filteredData = [...loadedData];
+                    }
+                    
+                    currentPage = 1; statusBox.innerHTML = '<span class="status-badge status-live">Live Data</span>'; renderPage();
+                }
+            }).catch(e => { 
+                if(container.innerHTML.includes("spinner")) container.innerHTML = `<div class="col-12 text-center text-danger">Failed to load.</div>`; 
+            });
+        }
+
+        function renderPage() {
+            const container = document.getElementById(currentContainer);
+            let htmlBuilder = ""; 
+            if (filteredData.length === 0) { container.innerHTML = `<div class="col-12 text-center text-muted py-5"><h4>No records found.</h4></div>`; return; }
+            const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+            const start = (currentPage - 1) * ITEMS_PER_PAGE; const end = start + ITEMS_PER_PAGE;
+            const pageData = filteredData.slice(start, end);
+            
+            if (totalPages > 1) {
+                const prevDisabled = currentPage === 1 ? "disabled" : ""; const nextDisabled = currentPage === totalPages ? "disabled" : "";
+                const endNum = Math.min(end, filteredData.length);
+                htmlBuilder += `
+                <div class="col-12 mb-4 d-flex justify-content-between align-items-center fade-in bg-dark p-3 rounded border border-secondary">
+                    <span class="text-white small fw-bold">Showing ${start + 1} to ${endNum} of ${filteredData.length} total</span>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-light btn-sm" ${prevDisabled} onclick="changePage(-1)">« Prev</button>
+                        <button class="btn btn-light btn-sm disabled text-dark fw-bold">Page ${currentPage} of ${totalPages}</button>
+                        <button class="btn btn-outline-light btn-sm" ${nextDisabled} onclick="changePage(1)">Next »</button>
+                    </div>
+                </div>`;
+            }
+            pageData.forEach(x => { htmlBuilder += currentRenderFn(x); });
+            container.innerHTML = htmlBuilder;
+        }
+
+        function changePage(direction) { currentPage += direction; renderPage(); document.getElementById('main-content').scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        function filterHistory() {
+            const filterVal = document.getElementById('history-filter').value;
+            if (filterVal === 'ALL') filteredData = [...loadedData];
+            else filteredData = loadedData.filter(item => item.status === filterVal);
+            currentPage = 1; renderPage();   
+        }
+
+        // ✅ NEW: Open the client-side PDF Modal
+        function previewVoucher(voucherNo) {
+            const item = loadedData.find(x => x.voucherNo === voucherNo);
+            if(!item) return;
+
+            document.getElementById('printVoucherNo').innerText = item.voucherNo;
+            document.getElementById('printDate').innerText = item.date;
+            document.getElementById('printStatus').innerText = item.status;
+            document.getElementById('printAmount').innerText = formatCurrency(item.amount);
+            document.getElementById('printBank').innerText = item.bank;
+            
+            let empTag = item.employeeNo ? `(Emp: ${item.employeeNo})` : '';
+            document.getElementById('printType').innerText = `${item.type} ${empTag}`;
+            document.getElementById('printNote').innerText = item.note || 'No description provided';
+            
+            document.getElementById('printPreparedBy').innerText = item.user;
+            
+            // Show approver info if it was approved
+            if (item.status === 'APPROVED' && item.approvedBy) {
+                document.getElementById('printApprovedBy').innerHTML = `${item.approvedBy}<br><span style="font-size: 0.6rem">${item.approvedTime}</span>`;
+            } else {
+                document.getElementById('printApprovedBy').innerText = "N/A";
+            }
+
+            // Build links for print mode so they can be clicked if saved as PDF
+            let linksHtml = '';
+            if (item.billUrl && item.billUrl !== 'No Bill') {
+                const urls = item.billUrl.split(',');
+                urls.forEach((u, i) => {
+                    linksHtml += `<a href="${u.trim()}" target="_blank" class="me-3">Attached Bill ${i+1}</a>`;
+                });
+            } else {
+                linksHtml = '<em>No Bills Attached</em>';
+            }
+            document.getElementById('printBillLinks').innerHTML = linksHtml;
+
+            if(!viewVoucherModalObj) viewVoucherModalObj = new bootstrap.Modal(document.getElementById('viewVoucherModal'));
+            viewVoucherModalObj.show();
+        }
+
+        // Generate dynamic PDF button based on what exists
+        function getPdfButton(item) {
+            if (item.status !== 'APPROVED') return '';
+            
+            // If it's a new client-side generation OR an old one, we use the new Modal which is 100x faster!
+            // But if we want to preserve old drive links for old data:
+            if (item.finalPdfUrl) {
+                return `<button class="btn btn-sm btn-success w-100 mb-1" onclick="previewVoucher('${item.voucherNo}')">📜 View Voucher</button>
+                        <a href="${item.finalPdfUrl}" target="_blank" class="btn btn-sm btn-outline-success w-100 mb-1" style="font-size: 0.7rem;">Old Drive PDF</a>`;
+            }
+            return `<button class="btn btn-sm btn-success w-100 mb-1" onclick="previewVoucher('${item.voucherNo}')">📜 View Voucher</button>`;
+        }
+
+        function renderCard(i) {
+            let view = getBillButtons(i.billUrl);
+            let empBadge = i.employeeNo ? `<span class="badge bg-info text-dark ms-1">${i.employeeNo}</span>` : '';
+            return `<div class="col-12 col-xl-6 fade-in">
+                <div class="card card-custom p-3 position-relative h-100">
+                    <div class="position-absolute top-0 start-0 m-3">
+                        <input type="checkbox" class="form-check-input voucher-check" value="${i.voucherNo}" onclick="updateBulkButton()">
+                    </div>
+                    <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-3">PENDING</span>
+                    <div class="ms-4 mb-2"><small class="text-muted fw-bold">${i.voucherNo}</small><div class="small text-muted">${i.date}</div></div>
+                    <h4 class="text-success fw-bold mb-2">${formatCurrency(i.amount)}</h4>
+                    <div class="small border-top border-bottom py-2 my-2"><div class="row g-1"><div class="col-6"><strong>Type:</strong> ${i.type} ${empBadge}</div><div class="col-6"><strong>Bank:</strong> <span class="text-primary">${i.bank}</span></div><div class="col-12"><strong>From:</strong> ${i.user}</div></div></div>
+                    <div class="mb-3 small bg-light p-2 rounded text-white bg-opacity-10"><strong>Note:</strong> ${i.note}</div>
+                    <div class="d-flex gap-2 border-top pt-3">
+                        <div class="d-flex flex-wrap gap-1">${view}</div><div class="flex-grow-1"></div>
+                        <button class="btn btn-sm btn-danger" onclick="process('${i.rowIndex}','${i.voucherNo}','REJECT')">Reject</button>
+                        <button class="btn btn-sm btn-success" onclick="process('${i.rowIndex}','${i.voucherNo}','APPROVE','')">Approve</button>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderHistoryCard(i) {
+            let bg = i.status === 'PENDING' ? 'bg-warning text-dark' : (i.status === 'APPROVED' ? 'bg-success' : 'bg-danger');
+            let isEditable = (i.status === 'PENDING' || i.status === 'REJECTED');
+            let view = getBillButtons(i.billUrl);
+            let empBadge = i.employeeNo ? `<span class="badge bg-info text-dark ms-1">${i.employeeNo}</span>` : '';
+
+            let rejectHtml = '';
+            if (i.status === 'REJECTED') {
+                try {
+                    let json = JSON.parse(i.rawData || '{}');
+                    if (json.reason) rejectHtml = `<div class="alert alert-danger py-2 px-2 mt-3 mb-0 small border-danger bg-danger bg-opacity-25 text-white"><strong>Reason:</strong> ${safeArg(json.reason)}</div>`;
+                } catch(e) {}
+            }
+
+            let edit = isEditable ? `<button class="btn btn-sm btn-outline-secondary w-100 mb-1" onclick="loadEdit('${safeArg(i.voucherNo)}', '${safeArg(i.date)}', '${safeArg(i.type)}', '${safeArg(i.bank)}', '${safeArg(i.amount)}', '${safeArg(i.note)}', '${safeArg(i.billUrl)}', '${safeArg(i.employeeNo)}')">✏️ Edit & Resend</button>` : '';
+            let pdfBtn = getPdfButton(i);
+
+            return `<div class="col-12 col-md-6 col-lg-4 fade-in history-item" data-status="${i.status}">
+                <div class="card card-custom p-3 position-relative h-100">
+                    <span class="badge ${bg} position-absolute top-0 end-0 m-3">${i.status}</span>
+                    <div class="fw-bold small text-muted">${i.voucherNo}</div><div class="small text-muted mb-2">${i.date}</div>
+                    <div class="fs-5 text-success fw-bold mb-2">${formatCurrency(i.amount)}</div>
+                    <div class="small border-top border-bottom py-2 my-2"><div class="row g-1"><div class="col-6"><strong>Type:</strong> ${i.type} ${empBadge}</div><div class="col-6"><strong>Bank:</strong> ${i.bank}</div><div class="col-12"><strong>User:</strong> ${i.user}</div></div></div>
+                    ${rejectHtml}
+                    <div class="small mt-2 mb-3 p-2 rounded text-white bg-white bg-opacity-10 text-break border border-secondary"><strong>Note:</strong> ${i.note}</div>
+                    <div class="mt-auto pt-2"><div class="row g-1"><div class="col-12">${edit}</div><div class="col-12">${pdfBtn}</div><div class="col-12">${view}</div></div></div>
+                </div>
+            </div>`;
+        }
+
+        function renderAuditCard(i) {
+            let bg = i.status === 'PENDING' ? 'bg-warning text-dark' : (i.status === 'APPROVED' ? 'bg-success' : 'bg-danger');
+            let view = getBillButtons(i.billUrl);
+            let pdf = (i.status === 'APPROVED') ? `<button class="btn btn-sm btn-primary w-100 mb-1" onclick="previewVoucher('${i.voucherNo}')">📜 View Voucher</button>` : '';
+            let empBadge = i.employeeNo ? `<span class="badge bg-info text-dark ms-1">${i.employeeNo}</span>` : '';
+
+            return `<div class="col-12 fade-in">
+                <div class="card card-custom p-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-3"><span class="badge ${bg} mb-1">${i.status}</span><br><span class="fw-bold small text-muted">${i.voucherNo}</span><br><span class="small">${i.date}</span></div>
+                        <div class="col-md-3"><div class="text-success fw-bold">${formatCurrency(i.amount)}</div><div class="small"><strong>Type:</strong> ${i.type} ${empBadge}</div><div class="small"><strong>Bank:</strong> ${i.bank}</div></div>
+                        <div class="col-md-3"><div class="small text-muted">User: ${i.user}</div><div class="small fst-italic text-break text-white-50">"${i.note}"</div></div>
+                        <div class="col-md-3 text-end d-flex flex-column gap-1 align-items-end">${pdf}<div class="d-flex gap-1 flex-wrap justify-content-end">${view}</div></div>
+                    </div>
+                </div>
+            </div>`;
+        }
+        
+        function process(idx, no, act, raw) {
+            if(act === 'REJECT') {
+                tempRejectData = { rowIndex: idx, voucherNo: no, approverEmail: CURRENT_USER };
+                if (!rejectModalObj) rejectModalObj = new bootstrap.Modal(document.getElementById('rejectModal'));
+                document.getElementById('rejectReasonInput').value = "";
+                rejectModalObj.show();
+            } else {
+                if(!confirm(`${act} ${no}?`)) return;
+                sendProcessRequest({action:act, rowIndex:idx, voucherNo:no, approverEmail:CURRENT_USER});
+            }
+        }
+
+        function submitRejection() {
+            const reason = document.getElementById('rejectReasonInput').value.trim();
+            if(!reason) { alert("Reason is required!"); return; }
+            if (rejectModalObj) rejectModalObj.hide();
+            tempRejectData.action = "REJECT";
+            tempRejectData.reason = reason;
+            sendProcessRequest(tempRejectData);
+        }
+
+        function sendProcessRequest(payload) {
+            showGlobalLoader("Authenticating & Processing... Please wait.");
+            fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })
+            .then(r => r.json()).then(d => { 
+                hideGlobalLoader(); alert(d.message); loadPending(); 
+            })
+            .catch(e => { hideGlobalLoader(); alert("Error: " + e.message); });
+        }
+
+        function updateBulkButton() {
+            const checks = document.querySelectorAll('.voucher-check:checked');
+            const btn = document.getElementById('bulk-approve-btn');
+            if(checks.length > 0) { btn.classList.remove('d-none'); btn.innerText = `Approve Selected (${checks.length})`; } else { btn.classList.add('d-none'); }
+        }
+
+        function processBulk() {
+            const checks = document.querySelectorAll('.voucher-check:checked');
+            if(checks.length === 0) return;
+            if(!confirm(`Approve ${checks.length} vouchers?`)) return;
+            const ids = Array.from(checks).map(c => c.value);
+            const btn = document.getElementById('bulk-approve-btn');
+            
+            showGlobalLoader(`Processing ${checks.length} Vouchers... Do not close the window.`);
+            btn.disabled = true; btn.innerText = "Processing...";
+            
+            fetch(API_URL,{method:"POST",body:JSON.stringify({action:"BULK_APPROVE", voucherIds:ids, approverEmail:CURRENT_USER})})
+            .then(r=>r.json()).then(d=>{ 
+                hideGlobalLoader(); alert(d.message); loadPending(); btn.disabled=false; 
+            })
+            .catch(e => { hideGlobalLoader(); btn.disabled=false; });
+        }
+
+        function loadSettings() {
+            document.getElementById('row-count-display').innerText = "...";
+            fetch(API_URL + "?action=getSystemStats").then(r=>r.json()).then(d=>{ document.getElementById('row-count-display').innerText = d.data.rowCount; });
+        }
+        
+        function downloadCSV() {
+            const btn = document.getElementById('csvBtn');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Downloading...'; btn.disabled = true;
+
+            fetch(API_URL + "?action=exportDB")
+            .then(r => r.json()).then(d => {
+                let csv = "ID,Voucher No,Date,Type,Bank,Amount,Note,Status,User,Employee No,Bill URL\n";
+                d.data.forEach(r => {
+                    const safe = (str) => `"${(str || '').toString().replace(/"/g, '""')}"`;
+                    csv += `${safe(r.rowIndex)},${safe(r.voucherNo)},${safe(r.date)},${safe(r.type)},${safe(r.bank)},${safe(r.amount)},${safe(r.note)},${safe(r.status)},${safe(r.user)},${safe(r.employeeNo)},${safe(r.billUrl)}\n`;
+                });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url;
+                a.download = `SoftCreation_DB_Backup_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+                btn.innerHTML = '<i class="bi bi-filetype-csv"></i> Download Full Database (CSV)'; btn.disabled = false;
+            }).catch(e => { alert("Failed to download CSV"); btn.disabled = false; });
+        }
+
+        function generateReport() {
+            const month = document.getElementById('reportMonth').value;
+            if (!month) { alert("Please select a month first."); return; }
+            const btn = document.getElementById('pdfBtn'); const linkDiv = document.getElementById('reportLink');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>'; btn.disabled = true;
+            linkDiv.innerHTML = "Generating PDF... This may take 10 seconds.";
+
+            fetch(API_URL + "?action=generateReportPdf&month=" + month)
+            .then(r => r.json()).then(d => {
+                if (d.status === "Success") linkDiv.innerHTML = `<a href="${d.data}" target="_blank" class="btn btn-sm btn-success w-100">📥 Open ${month} Report</a>`;
+                else linkDiv.innerHTML = `<span class="text-danger">Error: ${d.message}</span>`;
+                btn.innerHTML = '<i class="bi bi-file-pdf"></i> Generate PDF'; btn.disabled = false;
+            });
+        }
+
+        function logout() {
+            CURRENT_USER = null;
+            ['nav-form', 'nav-history', 'nav-approvals', 'nav-audit', 'nav-all-bills', 'nav-settings'].forEach(id => document.getElementById(id).classList.add('d-none'));
+            ['view-form', 'view-approvals', 'view-history', 'view-audit', 'view-all-bills', 'view-settings'].forEach(id => document.getElementById(id).classList.add('d-none'));
+            document.getElementById('maintenance-control').classList.add('d-none');
+            document.getElementById('loginEmail').value = ""; document.getElementById('loginError').innerText = "";
+            document.getElementById('loading-card').classList.add('d-none'); document.getElementById('login-card').classList.remove('d-none');
+            document.getElementById('login-overlay').classList.remove('d-none'); document.body.classList.remove('fade-out-exit');
+        }
+    </script>
+</body>
+</html>
