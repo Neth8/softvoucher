@@ -309,36 +309,59 @@
             </div>
         </div>
 
-        <div id="view-approvals" class="container-fluid d-none fade-in"><div class="d-flex justify-content-between align-items-center mb-4"><h3 class="fw-bold">🛡️ Approvals</h3><div class="d-flex gap-2"><button class="btn btn-success btn-sm d-none" id="bulk-approve-btn" onclick="processBulk()">Approve Selected</button><button class="btn btn-outline-secondary btn-sm" onclick="loadPending()">Refresh</button></div></div><div id="status-approvals"></div><div id="pending-list" class="row g-3"></div></div>
-        
-        <div id="view-history" class="container-fluid d-none fade-in">
+        <!-- VIEW APPROVALS -->
+        <div id="view-approvals" class="container-fluid d-none fade-in">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-bold">🕘 System History</h3>
+                <h3 class="fw-bold">🛡️ Approvals</h3>
                 <div class="d-flex gap-2">
-                    <select id="history-filter" class="form-select form-select-sm" onchange="filterHistory()" style="min-width: 120px;">
-                        <option value="ALL">All Status</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="APPROVED">Approved</option>
-                        <option value="REJECTED">Rejected</option>
-                    </select>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="loadMyHistory()">Refresh</button>
+                    <button class="btn btn-success btn-sm d-none" id="bulk-approve-btn" onclick="processBulk()">Approve Selected</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="loadPending()">Refresh</button>
                 </div>
             </div>
-            <div id="status-history"></div>
-            <div id="history-list" class="row g-3"></div>
-        </div>
-        
-        <div id="view-audit" class="container-fluid d-none fade-in"><div class="d-flex justify-content-between align-items-center mb-4"><h3 class="fw-bold">📋 Audit Log</h3><button class="btn btn-outline-secondary btn-sm" onclick="loadAudit()">Refresh</button></div><div id="status-audit"></div><div id="audit-list" class="row g-3"></div></div>
-        
-        <div id="view-all-bills" class="container-fluid d-none fade-in">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-bold">🗂️ All Bills Repository</h3>
-            </div>
+            <!-- Standard Filter Bar -->
             <div class="card card-custom p-3 mb-4">
                 <div class="row g-2 align-items-end">
                     <div class="col-md-2">
                         <label class="small fw-bold text-muted">Status</label>
-                        <select id="all-bills-filter" class="form-select" onchange="filterAllBills()">
+                        <select id="approvals-filter-status" class="form-select" onchange="applyFilters('approvals')">
+                            <option value="ALL">All Status</option>
+                            <option value="PENDING" selected>Pending</option>
+                            <option value="APPROVED">Approved</option>
+                            <option value="REJECTED">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted">Search by Voucher No</label>
+                        <input type="text" class="form-control" id="approvals-filter-voucher" placeholder="e.g. 202601" oninput="applyFilters('approvals')" onkeydown="if(event.key==='Enter') executeCombinedSearch('approvals')">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted">Search by Date</label>
+                        <input type="date" class="form-control" id="approvals-filter-date" onchange="applyFilters('approvals')">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100 fw-bold" onclick="executeCombinedSearch('approvals')">Search</button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" onclick="clearFilters('approvals')">Clear All</button>
+                    </div>
+                </div>
+            </div>
+            <div id="status-approvals"></div>
+            <div id="pending-list" class="row g-3"></div>
+        </div>
+        
+        <!-- VIEW HISTORY -->
+        <div id="view-history" class="container-fluid d-none fade-in">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">🕘 System History</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="loadMyHistory()">Refresh</button>
+            </div>
+            <!-- Standard Filter Bar -->
+            <div class="card card-custom p-3 mb-4">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-2">
+                        <label class="small fw-bold text-muted">Status</label>
+                        <select id="history-filter-status" class="form-select" onchange="applyFilters('history')">
                             <option value="ALL">All Status</option>
                             <option value="PENDING">Pending</option>
                             <option value="APPROVED">Approved</option>
@@ -347,17 +370,92 @@
                     </div>
                     <div class="col-md-3">
                         <label class="small fw-bold text-muted">Search by Voucher No</label>
-                        <input type="text" class="form-control" id="searchVoucherInput" placeholder="e.g. 202601" onkeydown="if(event.key==='Enter') executeCombinedSearch()">
+                        <input type="text" class="form-control" id="history-filter-voucher" placeholder="e.g. 202601" oninput="applyFilters('history')" onkeydown="if(event.key==='Enter') executeCombinedSearch('history')">
                     </div>
                     <div class="col-md-3">
                         <label class="small fw-bold text-muted">Search by Date</label>
-                        <input type="date" class="form-control" id="searchDate">
+                        <input type="date" class="form-control" id="history-filter-date" onchange="applyFilters('history')">
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-primary w-100 fw-bold" onclick="executeCombinedSearch()">Search</button>
+                        <button class="btn btn-primary w-100 fw-bold" onclick="executeCombinedSearch('history')">Search</button>
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-outline-secondary w-100" onclick="clearAllBillFilters()">Clear All</button>
+                        <button class="btn btn-outline-secondary w-100" onclick="clearFilters('history')">Clear All</button>
+                    </div>
+                </div>
+            </div>
+            <div id="status-history"></div>
+            <div id="history-list" class="row g-3"></div>
+        </div>
+        
+        <!-- VIEW AUDIT -->
+        <div id="view-audit" class="container-fluid d-none fade-in">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">📋 Audit Log</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="loadAudit()">Refresh</button>
+            </div>
+            <!-- Standard Filter Bar -->
+            <div class="card card-custom p-3 mb-4">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-2">
+                        <label class="small fw-bold text-muted">Status</label>
+                        <select id="audit-filter-status" class="form-select" onchange="applyFilters('audit')">
+                            <option value="ALL">All Status</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="APPROVED">Approved</option>
+                            <option value="REJECTED">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted">Search by Voucher No</label>
+                        <input type="text" class="form-control" id="audit-filter-voucher" placeholder="e.g. 202601" oninput="applyFilters('audit')" onkeydown="if(event.key==='Enter') executeCombinedSearch('audit')">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted">Search by Date</label>
+                        <input type="date" class="form-control" id="audit-filter-date" onchange="applyFilters('audit')">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100 fw-bold" onclick="executeCombinedSearch('audit')">Search</button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" onclick="clearFilters('audit')">Clear All</button>
+                    </div>
+                </div>
+            </div>
+            <div id="status-audit"></div>
+            <div id="audit-list" class="row g-3"></div>
+        </div>
+        
+        <!-- VIEW ALL BILLS -->
+        <div id="view-all-bills" class="container-fluid d-none fade-in">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">🗂️ All Bills Repository</h3>
+            </div>
+            <!-- Standard Filter Bar -->
+            <div class="card card-custom p-3 mb-4">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-2">
+                        <label class="small fw-bold text-muted">Status</label>
+                        <select id="all-bills-filter-status" class="form-select" onchange="applyFilters('all-bills')">
+                            <option value="ALL">All Status</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="APPROVED">Approved</option>
+                            <option value="REJECTED">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted">Search by Voucher No</label>
+                        <input type="text" class="form-control" id="all-bills-filter-voucher" placeholder="e.g. 202601" oninput="applyFilters('all-bills')" onkeydown="if(event.key==='Enter') executeCombinedSearch('all-bills')">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted">Search by Date</label>
+                        <input type="date" class="form-control" id="all-bills-filter-date" onchange="applyFilters('all-bills')">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100 fw-bold" onclick="executeCombinedSearch('all-bills')">Search</button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" onclick="clearFilters('all-bills')">Clear All</button>
                     </div>
                 </div>
             </div>
@@ -508,7 +606,7 @@
         let revertModalObj = null;
         let viewVoucherModalObj = null;
 
-        // --- PAGINATION VARIABLES ---
+        // --- PAGINATION & FILTER VARIABLES ---
         let loadedData = [];       
         let filteredData = [];     
         let currentPage = 1;
@@ -842,58 +940,84 @@
         function formatCurrency(amount) { return "Rs. " + Number(amount).toLocaleString('en-LK', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
         function processFile(f, cb) { const r=new FileReader(); r.onload=e=>{ if(f.type==="application/pdf") cb(e.target.result.split(',')[1],f.type,f.name); else if(f.type.startsWith("image/")){ const i=new Image(); i.onload=()=>{ const c=document.createElement('canvas'), x=c.getContext('2d'), M=1000; let w=i.width, h=i.height; if(w>h){if(w>M){h*=M/w;w=M}}else{if(h>M){w*=M/h;h=M}} c.width=w; c.height=h; x.drawImage(i,0,0,w,h); cb(c.toDataURL('image/jpeg',0.7).split(',')[1],"image/jpeg",f.name); }; i.src=e.target.result; } else alert("Use PDF or Image."); }; r.readAsDataURL(f); }
 
-        function loadPending() { fetchList("getPending", "pending-list", renderCard, "CACHE_PENDING", "status-approvals"); }
+        function loadPending() { 
+            clearFilters('approvals', false);
+            fetchList("getPending", "pending-list", renderCard, "CACHE_PENDING", "status-approvals"); 
+        }
         function loadMyHistory() { 
-            document.getElementById('history-filter').value = 'ALL'; 
+            clearFilters('history', false);
             fetchList("getAllVouchers", "history-list", renderHistoryCard, "CACHE_HISTORY", "status-history"); 
         }
-        function loadAudit() { fetchList("getAllVouchers", "audit-list", renderAuditCard, "CACHE_AUDIT", "status-audit"); }
-        function loadAllBills() { clearAllBillFilters(); }
-
-        function clearAllBillFilters() {
-            document.getElementById('all-bills-filter').value = 'ALL';
-            document.getElementById('searchDate').value = ""; 
-            document.getElementById('searchVoucherInput').value = ""; 
+        function loadAudit() { 
+            clearFilters('audit', false);
+            fetchList("getAllVouchers", "audit-list", renderAuditCard, "CACHE_AUDIT", "status-audit"); 
+        }
+        function loadAllBills() { 
+            clearFilters('all-bills', false);
             fetchList("getAllVouchers", "all-bills-list", renderAuditCard, "CACHE_ALL", "status-all-bills"); 
         }
 
-        function executeCombinedSearch() {
-            const voucherInput = document.getElementById('searchVoucherInput').value.trim();
-            const dateInput = document.getElementById('searchDate').value;
-            if (voucherInput) searchBillsByVoucher(voucherInput);
-            else if (dateInput) searchBillsByDate(dateInput);
-            else alert("Please enter a Voucher Number or select a Date to query.");
+        // --- FILTER & SEARCH CONTROLLER ---
+        function applyFilters(screenPrefix) {
+            const statusVal = document.getElementById(`${screenPrefix}-filter-status`).value;
+            const voucherVal = document.getElementById(`${screenPrefix}-filter-voucher`).value.trim().toLowerCase();
+            const dateVal = document.getElementById(`${screenPrefix}-filter-date`).value;
+
+            filteredData = loadedData.filter(item => {
+                const matchStatus = (statusVal === 'ALL') || (item.status === statusVal);
+                const matchVoucher = (!voucherVal) || (item.voucherNo && item.voucherNo.toString().toLowerCase().includes(voucherVal));
+                const matchDate = (!dateVal) || (item.date === dateVal);
+                return matchStatus && matchVoucher && matchDate;
+            });
+
+            currentPage = 1;
+            renderPage();
         }
 
-        function searchBillsByDate(date) {
-            currentContainer = "all-bills-list"; currentRenderFn = renderAuditCard;
-            document.getElementById("status-all-bills").innerHTML = ""; 
-            document.getElementById("all-bills-list").innerHTML='<div class="col-12 text-center text-muted"><div class="spinner-border text-primary mb-2"></div>Searching Entire Database by Date...</div>';
-            fetch(API_URL+"?action=searchByDate&date="+date).then(r=>r.json()).then(j=>{
+        function clearFilters(screenPrefix, triggerFetch = true) {
+            document.getElementById(`${screenPrefix}-filter-status`).value = (screenPrefix === 'approvals') ? 'PENDING' : 'ALL';
+            document.getElementById(`${screenPrefix}-filter-voucher`).value = "";
+            document.getElementById(`${screenPrefix}-filter-date`).value = "";
+
+            if (triggerFetch) {
+                if (screenPrefix === 'approvals') loadPending();
+                else if (screenPrefix === 'history') loadMyHistory();
+                else if (screenPrefix === 'audit') loadAudit();
+                else if (screenPrefix === 'all-bills') loadAllBills();
+            }
+        }
+
+        function executeCombinedSearch(screenPrefix) {
+            const voucherVal = document.getElementById(`${screenPrefix}-filter-voucher`).value.trim();
+            const dateVal = document.getElementById(`${screenPrefix}-filter-date`).value;
+
+            if (voucherVal) searchServerByVoucher(screenPrefix, voucherVal);
+            else if (dateVal) searchServerByDate(screenPrefix, dateVal);
+            else applyFilters(screenPrefix);
+        }
+
+        function searchServerByDate(screenPrefix, date) {
+            setScreenTarget(screenPrefix);
+            fetch(API_URL + "?action=searchByDate&date=" + date).then(r => r.json()).then(j => {
                 loadedData = j.data || [];
-                const filterVal = document.getElementById('all-bills-filter').value;
-                filteredData = (filterVal === 'ALL') ? [...loadedData] : loadedData.filter(item => item.status === filterVal);
-                currentPage = 1; renderPage(); 
+                applyFilters(screenPrefix);
             });
         }
 
-        function searchBillsByVoucher(voucherNo) {
-            currentContainer = "all-bills-list"; currentRenderFn = renderAuditCard;
-            document.getElementById("status-all-bills").innerHTML = ""; 
-            document.getElementById("all-bills-list").innerHTML='<div class="col-12 text-center text-muted"><div class="spinner-border text-primary mb-2"></div>Searching Entire Database by Voucher Number...</div>';
-            fetch(API_URL+"?action=searchByVoucher&voucherNo="+encodeURIComponent(voucherNo)).then(r=>r.json()).then(j=>{
+        function searchServerByVoucher(screenPrefix, voucherNo) {
+            setScreenTarget(screenPrefix);
+            fetch(API_URL + "?action=searchByVoucher&voucherNo=" + encodeURIComponent(voucherNo)).then(r => r.json()).then(j => {
                 loadedData = j.data || [];
-                const filterVal = document.getElementById('all-bills-filter').value;
-                filteredData = (filterVal === 'ALL') ? [...loadedData] : loadedData.filter(item => item.status === filterVal);
-                currentPage = 1; renderPage(); 
+                applyFilters(screenPrefix);
             });
         }
 
-        function filterAllBills() {
-            const filterVal = document.getElementById('all-bills-filter').value;
-            if (filterVal === 'ALL') filteredData = [...loadedData];
-            else filteredData = loadedData.filter(item => item.status === filterVal);
-            currentPage = 1; renderPage();
+        function setScreenTarget(screenPrefix) {
+            if (screenPrefix === 'approvals') { currentContainer = "pending-list"; currentRenderFn = renderCard; }
+            else if (screenPrefix === 'history') { currentContainer = "history-list"; currentRenderFn = renderHistoryCard; }
+            else if (screenPrefix === 'audit') { currentContainer = "audit-list"; currentRenderFn = renderAuditCard; }
+            else if (screenPrefix === 'all-bills') { currentContainer = "all-bills-list"; currentRenderFn = renderAuditCard; }
+            document.getElementById(currentContainer).innerHTML = '<div class="col-12 text-center text-muted py-4"><div class="spinner-border text-primary mb-2"></div>Searching Server...</div>';
         }
 
         function fetchList(action, divId, renderFn, cacheKey, statusId) {
@@ -914,17 +1038,11 @@
                     localStorage.setItem(cacheKey, JSON.stringify(j.data)); 
                     loadedData = j.data;
                     
-                    if (divId === 'history-list') {
-                        const filterVal = document.getElementById('history-filter').value;
-                        filteredData = (filterVal === 'ALL') ? [...loadedData] : loadedData.filter(item => item.status === filterVal);
-                    } else if (divId === 'all-bills-list') {
-                        const filterVal = document.getElementById('all-bills-filter').value;
-                        filteredData = (filterVal === 'ALL') ? [...loadedData] : loadedData.filter(item => item.status === filterVal);
-                    } else {
-                        filteredData = [...loadedData];
-                    }
-                    
-                    currentPage = 1; statusBox.innerHTML = '<span class="status-badge status-live">Live Data</span>'; renderPage();
+                    let screenPrefix = divId.replace('-list', '');
+                    if (screenPrefix === 'pending') screenPrefix = 'approvals';
+                    applyFilters(screenPrefix);
+
+                    statusBox.innerHTML = '<span class="status-badge status-live">Live Data</span>';
                 }
             }).catch(e => { 
                 if(container.innerHTML.includes("spinner")) container.innerHTML = `<div class="col-12 text-center text-danger">Failed to load.</div>`; 
@@ -957,13 +1075,6 @@
         }
 
         function changePage(direction) { currentPage += direction; renderPage(); document.getElementById('main-content').scrollTo({ top: 0, behavior: 'smooth' }); }
-
-        function filterHistory() {
-            const filterVal = document.getElementById('history-filter').value;
-            if (filterVal === 'ALL') filteredData = [...loadedData];
-            else filteredData = loadedData.filter(item => item.status === filterVal);
-            currentPage = 1; renderPage();   
-        }
 
         function previewVoucher(voucherNo) {
             const item = loadedData.find(x => x.voucherNo === voucherNo);
