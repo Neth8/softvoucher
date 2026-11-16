@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -116,7 +116,7 @@
             <!-- Bottom Actions -->
             <div class="pt-3 border-top d-flex gap-2">
                 <button class="btn btn-outline-secondary btn-sm flex-grow-1" id="btnToggleTheme" title="Switch Theme">
-                    <i class="bi bi-sun-fill" id="themeToggleIcon"></i>
+                    <i class="bi bi-moon-stars-fill" id="themeToggleIcon"></i>
                 </button>
                 <button class="btn btn-outline-danger btn-sm flex-grow-1" id="btnLogout" title="Sign Out">
                     <i class="bi bi-box-arrow-right"></i> Logout
@@ -139,6 +139,10 @@
                         <span class="status-pulse-dot"></span>
                         <span class="small fw-semibold text-muted" style="font-size: 0.72rem;">Supabase Connected</span>
                     </div>
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-flex align-items-center gap-2" id="btnTopThemeToggle" onclick="APP.toggleTheme()" title="Switch Theme">
+                        <i class="bi bi-moon-stars-fill" id="topThemeIcon"></i>
+                        <span class="small fw-semibold d-none d-md-inline" id="topThemeLabel">Dark Mode</span>
+                    </button>
                 </div>
             </header>
 

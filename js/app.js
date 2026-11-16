@@ -5,7 +5,7 @@
 
 const APP = {
     currentUser: null,
-    currentTheme: "dark",
+    currentTheme: "light",
 
     init() {
         this.initTheme();
@@ -20,7 +20,7 @@ const APP = {
     },
 
     initTheme() {
-        const saved = localStorage.getItem("softcreation_theme_v2") || "dark";
+        const saved = localStorage.getItem("softcreation_theme_v2") || "light";
         this.setTheme(saved);
     },
 
@@ -32,6 +32,15 @@ const APP = {
         const icon = document.getElementById("themeToggleIcon");
         if (icon) {
             icon.className = theme === "dark" ? "bi bi-sun-fill" : "bi bi-moon-stars-fill";
+        }
+
+        const topIcon = document.getElementById("topThemeIcon");
+        const topLabel = document.getElementById("topThemeLabel");
+        if (topIcon) {
+            topIcon.className = theme === "dark" ? "bi bi-sun-fill" : "bi bi-moon-stars-fill";
+        }
+        if (topLabel) {
+            topLabel.innerText = theme === "dark" ? "Light Mode" : "Dark Mode";
         }
     },
 

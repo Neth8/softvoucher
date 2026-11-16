@@ -14,32 +14,34 @@
     --sidebar-w: 250px;
     --header-h: 60px;
     
-    /* Light Theme Palette */
+    /* Light Theme Palette - Default Theme */
     --bg-body: #f8fafc;
     --bg-surface: #ffffff;
     --bg-surface-subtle: #f1f5f9;
     --bg-card: #ffffff;
-    --border-color: #e2e8f0;
-    --border-subtle: #edf2f7;
+    --border-color: #cbd5e1;       /* Crisp, clearly visible Slate-300 border */
+    --border-subtle: #e2e8f0;      /* Slate-200 secondary divider */
+    --border-hover: #94a3b8;       /* Slate-400 interactive hover outline */
     --text-main: #0f172a;
     --text-muted: #64748b;
     --sidebar-bg: #ffffff;
-    --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
-    --card-shadow-hover: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+    --card-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 2px 8px -1px rgba(15, 23, 42, 0.04);
+    --card-shadow-hover: 0 6px 18px -2px rgba(15, 23, 42, 0.1), 0 2px 6px -1px rgba(15, 23, 42, 0.05);
 }
 
 [data-bs-theme="dark"] {
     --bg-body: #090d16;
     --bg-surface: #0f172a;
     --bg-surface-subtle: #1e293b;
-    --bg-card: rgba(15, 23, 42, 0.85);
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-subtle: rgba(255, 255, 255, 0.04);
+    --bg-card: #0f172a;
+    --border-color: rgba(255, 255, 255, 0.14);  /* Clean, visible dark mode outline */
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 255, 255, 0.26);
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --sidebar-bg: #030712;
-    --card-shadow: 0 12px 35px -8px rgba(0, 0, 0, 0.6);
-    --card-shadow-hover: 0 20px 45px -10px rgba(0, 0, 0, 0.75);
+    --card-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
+    --card-shadow-hover: 0 16px 36px -6px rgba(0, 0, 0, 0.75);
 }
 
 /* Base Body Styles */
@@ -339,17 +341,18 @@ body {
     }
 }
 
-/* Modern Cards */
+/* Modern Cards with Professional Outlines */
 .card-custom {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-radius: 14px;
     box-shadow: var(--card-shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .card-custom:hover {
     box-shadow: var(--card-shadow-hover);
+    border-color: var(--border-hover);
 }
 
 /* Modern Segmented Filter Pills */
@@ -367,9 +370,9 @@ body {
     display: flex;
     align-items: center;
     gap: 0.45rem;
-    padding: 0.35rem 0.85rem;
+    padding: 0.4rem 0.9rem;
     border-radius: 9px;
-    border: none;
+    border: 1px solid transparent;
     background: transparent;
     color: var(--text-muted);
     font-size: 0.8rem;
@@ -380,43 +383,48 @@ body {
 
 .filter-pill:hover {
     color: var(--text-main);
+    border-color: var(--border-subtle);
 }
 
 .filter-pill.active {
     background: var(--bg-surface);
     color: var(--text-main);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-color: var(--border-color);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .pill-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
 }
 
-/* Interactive Table */
+/* Interactive Table with Crisp Professional Outlines */
 .table-custom {
     color: var(--text-main);
     border-color: var(--border-color);
     margin-bottom: 0;
     vertical-align: middle;
+    width: 100%;
 }
 
 .table-custom th {
     background: var(--bg-surface-subtle);
     color: var(--text-muted);
-    font-size: 0.72rem;
+    font-size: 0.73rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: 700;
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid var(--border-color);
+    padding: 0.9rem 1.15rem;
+    border-bottom: 2px solid var(--border-color);
+    border-top: none;
+    white-space: nowrap;
 }
 
 .table-custom td {
-    padding: 0.8rem 1rem;
+    padding: 0.85rem 1.15rem;
     border-bottom: 1px solid var(--border-color);
-    font-size: 0.86rem;
+    font-size: 0.875rem;
 }
 
 .table-custom tbody tr {
@@ -425,6 +433,10 @@ body {
 
 .table-custom tbody tr:hover td {
     background-color: var(--bg-surface-subtle);
+}
+
+.table-custom tbody tr:last-child td {
+    border-bottom: none;
 }
 
 /* Monospace Voucher Numbers & Amounts */
