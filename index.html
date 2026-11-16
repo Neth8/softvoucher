@@ -239,61 +239,77 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold text-muted text-uppercase">Date</label>
-                                    <input type="date" class="form-control" id="formDate">
+                                    <input type="date" class="form-control" id="formDate" onchange="VOUCHER_CONTROLLER.handleDateChange()">
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Bank / Payment
-                                        Method</label>
-                                    <select class="form-select" id="formBank"></select>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Bank / Payment Method</label>
+                                    <select class="form-select" id="formBank">
+                                        <option value="" selected disabled>Select Bank Account...</option>
+                                        <option value="People's Bank 226100130071423">People's Bank 226100130071423</option>
+                                        <option value="BOC 92746436">BOC 92746436</option>
+                                        <option value="Sampath bank 021510002668">Sampath bank 021510002668</option>
+                                        <option value="CASH BANK">CASH BANK</option>
+                                        <option value="People's Bank New 012100110071423">People's Bank New 012100110071423</option>
+                                        <option value="Com Bank - 1000671993">Com Bank - 1000671993</option>
+                                        <option value="NDB - 111000097345">NDB - 111000097345</option>
+                                        <option value="COM MMA - 2000272029">COM MMA - 2000272029</option>
+                                        <option value="SAMPATH MMA - 121515001498">SAMPATH MMA - 121515001498</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Expense
-                                        Type</label>
-                                    <select class="form-select" id="formType"></select>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Expense Type</label>
+                                    <select class="form-select" id="formType" onchange="VOUCHER_CONTROLLER.handleTypeChange()">
+                                        <option value="Food" selected>Food</option>
+                                        <option value="Travel">Travel</option>
+                                        <option value="Supplies">Supplies</option>
+                                        <option value="Welfare">Welfare</option>
+                                        <option value="Utilities">Utilities</option>
+                                        <option value="Salary">Salary</option>
+                                        <option value="Commission">Commission</option>
+                                        <option value="Other">Other</option>
+                                    </select>
                                 </div>
 
                                 <div class="col-md-6 d-none" id="empNoContainer">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Employee
-                                        Number</label>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Employee Number</label>
                                     <input type="text" class="form-control" id="formEmpNo" placeholder="e.g. EMP001">
                                 </div>
                                 <div class="col-md-6 d-none" id="otherTypeContainer">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Specify Expense
-                                        Type</label>
-                                    <input type="text" class="form-control" id="formOtherType"
-                                        placeholder="Specify expense category...">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Specify Expense Type</label>
+                                    <input type="text" class="form-control" id="formOtherType" placeholder="Specify expense category...">
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Amount
-                                        (LKR)</label>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Amount (LKR)</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-body-tertiary fw-bold">Rs.</span>
-                                        <input type="number" step="0.01" class="form-control fs-5 fw-bold"
-                                            id="formAmount" placeholder="0.00">
+                                        <input type="number" step="0.01" class="form-control fs-5 fw-bold" id="formAmount" placeholder="0.00">
                                     </div>
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Description /
-                                        Note</label>
-                                    <textarea class="form-control" id="formNote" rows="2"
-                                        placeholder="Explain the purpose of this voucher..."></textarea>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Description / Note</label>
+                                    <textarea class="form-control" id="formNote" rows="2" placeholder="Explain the purpose of this voucher..."></textarea>
                                 </div>
 
                                 <!-- File Attachments -->
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Attach Supporting
-                                        Bills (Images / PDF)</label>
-                                    <div class="d-flex flex-wrap gap-2" id="filePreviewArea">
-                                        <!-- Dynamic preview cards -->
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label small fw-bold text-muted text-uppercase mb-0">Attach Supporting Bills (Images / PDF)</label>
+                                        <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold" onclick="document.getElementById('fileInput').click()">
+                                            <i class="bi bi-paperclip me-1"></i> Browse Files
+                                        </button>
                                     </div>
-                                    <input type="file" id="fileInput" class="d-none" multiple
-                                        accept="image/*,application/pdf">
-                                    <div class="form-text small text-muted mt-2">
-                                        Files are securely uploaded directly to cloud storage. You can attach multiple
-                                        receipts.
+                                    <div class="d-flex flex-wrap gap-2 align-items-center p-2 rounded-3 border bg-body-tertiary" id="filePreviewArea" style="min-height: 100px;">
+                                        <div class="upload-trigger-box shadow-sm" onclick="document.getElementById('fileInput').click()" title="Click to browse files or drop here">
+                                            <i class="bi bi-cloud-arrow-up fs-2 text-primary"></i>
+                                            <span class="small mt-1 fw-bold">Attach Bill</span>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="fileInput" class="d-none" multiple accept="image/*,application/pdf">
+                                    <div class="form-text small text-muted mt-1">
+                                        <i class="bi bi-info-circle me-1"></i> Multiple images or PDFs allowed. Click any attached preview to inspect it.
                                     </div>
                                 </div>
                             </div>

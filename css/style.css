@@ -321,6 +321,34 @@ body {
     justify-content: center;
     font-size: 11px;
     cursor: pointer;
+    z-index: 5;
+}
+
+.drag-over {
+    border-color: var(--primary) !important;
+    background-color: var(--primary-glow) !important;
+}
+
+.file-preview-card {
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.file-preview-card:hover {
+    transform: scale(1.05);
+    border-color: var(--primary);
+}
+
+.file-preview-card .preview-badge {
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    background: rgba(15, 23, 42, 0.75);
+    color: #ffffff;
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 4px;
+    pointer-events: none;
 }
 
 /* Gallery Styles */

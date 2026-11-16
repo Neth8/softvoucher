@@ -176,6 +176,12 @@ const APP = {
         // Trigger view-specific loads
         if (tabId === "tab-ledger") {
             if (window.LEDGER_CONTROLLER) LEDGER_CONTROLLER.fetchData(1);
+        } else if (tabId === "tab-voucher-form") {
+            if (window.VOUCHER_CONTROLLER) {
+                VOUCHER_CONTROLLER.populateDropdowns();
+                VOUCHER_CONTROLLER.handleDateChange();
+                VOUCHER_CONTROLLER.renderFilePreviews();
+            }
         } else if (tabId === "tab-approvals") {
             if (window.APPROVALS_CONTROLLER) APPROVALS_CONTROLLER.fetchPending();
         } else if (tabId === "tab-gallery") {
@@ -405,6 +411,8 @@ const APP = {
         }, 4000);
     }
 };
+
+window.APP = APP;
 
 // Global bootstrap on window load
 window.addEventListener("DOMContentLoaded", () => {

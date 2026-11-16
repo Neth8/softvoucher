@@ -15,13 +15,13 @@ const VOUCHER_CONTROLLER = {
 
     populateDropdowns() {
         const bankSelect = document.getElementById("formBank");
-        if (bankSelect) {
+        if (bankSelect && bankSelect.options.length <= 1) {
             bankSelect.innerHTML = '<option value="" selected disabled>Select Bank Account...</option>' +
                 CONFIG.BANKS.map(b => `<option value="${b}">${b}</option>`).join("");
         }
 
         const typeSelect = document.getElementById("formType");
-        if (typeSelect) {
+        if (typeSelect && typeSelect.options.length === 0) {
             typeSelect.innerHTML = CONFIG.EXPENSE_TYPES.map(t => `<option value="${t}">${t}</option>`).join("");
         }
     },
@@ -30,6 +30,7 @@ const VOUCHER_CONTROLLER = {
         const dateInput = document.getElementById("formDate");
         if (dateInput) {
             dateInput.addEventListener("change", () => this.handleDateChange());
+            dateInput.addEventListener("input", () => this.handleDateChange());
         }
 
         const typeSelect = document.getElementById("formType");
@@ -51,18 +52,39 @@ const VOUCHER_CONTROLLER = {
         if (resetBtn) {
             resetBtn.addEventListener("click", () => this.resetForm());
         }
+
+        // Drag and drop attachment area
+        const dropArea = document.getElementById("filePreviewArea");
+        if (dropArea) {
+            dropArea.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                dropArea.classList.add("drag-over");
+            });
+            dropArea.addEventListener("dragleave", () => {
+                dropArea.classList.remove("drag-over");
+            });
+            dropArea.addEventListener("drop", (e) => {
+                e.preventDefault();
+                dropArea.classList.remove("drag-over");
+                if (e.dataTransfer && e.dataTransfer.files) {
+                    this.handleFilesAdded(e.dataTransfer.files);
+                }
+            });
+        }
     },
 
     async handleDateChange() {
-        const dateVal = document.getElementById("formDate").value;
+        const dateVal = document.getElementById("formDate")?.value;
         const display = document.getElementById("formVoucherNo");
+        if (!display) return;
+
         if (!dateVal) {
             display.value = "Select date first...";
             return;
         }
 
         if (editModeVoucherNo) {
-            // In edit mode, retain or adapt
+            display.value = editModeVoucherNo;
             return;
         }
 
@@ -71,13 +93,18 @@ const VOUCHER_CONTROLLER = {
             const { voucherNo } = await dbGetNextSequence(dateVal);
             display.value = voucherNo;
         } catch (err) {
-            console.error("Sequence error:", err);
-            display.value = "Error generating sequence";
+            console.warn("Sequence calculation warning:", err);
+            // Fallback generation (YYYYMM01) if table is fresh or offline
+            const parts = dateVal.split("-");
+            const fallbackNo = `${parts[0]}${parts[1]}01`;
+            display.value = fallbackNo;
         }
     },
 
     handleTypeChange() {
-        const type = document.getElementById("formType").value;
+        const typeEl = document.getElementById("formType");
+        if (!typeEl) return;
+        const type = typeEl.value;
         const empContainer = document.getElementById("empNoContainer");
         const otherContainer = document.getElementById("otherTypeContainer");
 
@@ -95,7 +122,8 @@ const VOUCHER_CONTROLLER = {
         for (let i = 0; i < fileList.length; i++) {
             const file = fileList[i];
             const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-            const previewUrl = isPdf ? null : URL.createObjectURL(file);
+            // Object URL for both image and PDF preview
+            const previewUrl = URL.createObjectURL(file);
 
             attachedFiles.push({
                 fileObject: file,
@@ -107,8 +135,8 @@ const VOUCHER_CONTROLLER = {
         }
 
         this.renderFilePreviews();
-        // Clear file input
-        document.getElementById("fileInput").value = "";
+        const fileInput = document.getElementById("fileInput");
+        if (fileInput) fileInput.value = "";
     },
 
     removeFile(index) {
@@ -119,24 +147,34 @@ const VOUCHER_CONTROLLER = {
         this.renderFilePreviews();
     },
 
+    previewAttachedItem(index) {
+        const item = attachedFiles[index];
+        if (!item) return;
+        const url = item.previewUrl || item.existingUrl;
+        if (url && window.APP) {
+            APP.openMediaPreview(url);
+        }
+    },
+
     renderFilePreviews() {
         const container = document.getElementById("filePreviewArea");
         if (!container) return;
 
         let html = `
-            <div class="upload-trigger-box" onclick="document.getElementById('fileInput').click()" title="Attach Receipt / Bill">
-                <i class="bi bi-cloud-arrow-up fs-3"></i>
-                <span class="small mt-1">Add Bill</span>
+            <div class="upload-trigger-box shadow-sm" onclick="document.getElementById('fileInput').click()" title="Click to browse files or drop here">
+                <i class="bi bi-cloud-arrow-up fs-2 text-primary"></i>
+                <span class="small mt-1 fw-bold">Attach Bill</span>
             </div>
         `;
 
         attachedFiles.forEach((file, index) => {
             if (file.isPdf) {
                 html += `
-                    <div class="file-preview-card pdf-card">
-                        <i class="bi bi-file-earmark-pdf-fill text-danger fs-2"></i>
+                    <div class="file-preview-card pdf-card shadow-sm" onclick="VOUCHER_CONTROLLER.previewAttachedItem(${index})" title="Click to preview PDF">
+                        <i class="bi bi-file-earmark-pdf-fill text-danger fs-1"></i>
                         <span class="file-name" title="${file.name}">${file.name}</span>
-                        <button type="button" class="btn-remove-file" onclick="VOUCHER_CONTROLLER.removeFile(${index})" title="Remove">
+                        <div class="preview-badge"><i class="bi bi-zoom-in"></i></div>
+                        <button type="button" class="btn-remove-file" onclick="event.stopPropagation(); VOUCHER_CONTROLLER.removeFile(${index})" title="Remove">
                             <i class="bi bi-x"></i>
                         </button>
                     </div>
@@ -144,10 +182,11 @@ const VOUCHER_CONTROLLER = {
             } else {
                 const src = file.previewUrl || file.existingUrl;
                 html += `
-                    <div class="file-preview-card">
+                    <div class="file-preview-card shadow-sm" onclick="VOUCHER_CONTROLLER.previewAttachedItem(${index})" title="Click to preview Image">
                         <img src="${src}" alt="Receipt">
                         <span class="file-name" title="${file.name}">${file.name}</span>
-                        <button type="button" class="btn-remove-file" onclick="VOUCHER_CONTROLLER.removeFile(${index})" title="Remove">
+                        <div class="preview-badge"><i class="bi bi-zoom-in"></i></div>
+                        <button type="button" class="btn-remove-file" onclick="event.stopPropagation(); VOUCHER_CONTROLLER.removeFile(${index})" title="Remove">
                             <i class="bi bi-x"></i>
                         </button>
                     </div>
@@ -163,17 +202,37 @@ const VOUCHER_CONTROLLER = {
         attachedFiles.forEach(f => { if (f.previewUrl) URL.revokeObjectURL(f.previewUrl); });
         attachedFiles = [];
 
-        document.getElementById("formDate").value = new Date().toISOString().slice(0, 10);
-        document.getElementById("formBank").value = "";
-        document.getElementById("formType").value = "Food";
-        document.getElementById("formAmount").value = "";
-        document.getElementById("formNote").value = "";
-        document.getElementById("formEmpNo").value = "";
-        document.getElementById("formOtherType").value = "";
+        const dateInput = document.getElementById("formDate");
+        if (dateInput) {
+            dateInput.value = new Date().toISOString().slice(0, 10);
+        }
 
-        document.getElementById("formTitle").innerText = "🧾 Submit Payment Voucher";
-        document.getElementById("btnSubmitVoucher").innerText = "Submit for Approval";
-        document.getElementById("btnCancelEdit").classList.add("d-none");
+        const bankInput = document.getElementById("formBank");
+        if (bankInput) bankInput.value = "";
+
+        const typeInput = document.getElementById("formType");
+        if (typeInput) typeInput.value = "Food";
+
+        const amountInput = document.getElementById("formAmount");
+        if (amountInput) amountInput.value = "";
+
+        const noteInput = document.getElementById("formNote");
+        if (noteInput) noteInput.value = "";
+
+        const empInput = document.getElementById("formEmpNo");
+        if (empInput) empInput.value = "";
+
+        const otherInput = document.getElementById("formOtherType");
+        if (otherInput) otherInput.value = "";
+
+        const titleEl = document.getElementById("formTitle");
+        if (titleEl) titleEl.innerText = "🧾 Submit Payment Voucher";
+
+        const btnSubmit = document.getElementById("btnSubmitVoucher");
+        if (btnSubmit) btnSubmit.innerText = "Submit for Approval";
+
+        const btnCancel = document.getElementById("btnCancelEdit");
+        if (btnCancel) btnCancel.classList.add("d-none");
 
         this.handleTypeChange();
         this.handleDateChange();
@@ -221,13 +280,13 @@ const VOUCHER_CONTROLLER = {
         document.getElementById("btnSubmitVoucher").innerText = "Update & Resubmit Voucher";
         document.getElementById("btnCancelEdit").classList.remove("d-none");
 
-        APP.switchTab("tab-voucher-form");
+        if (window.APP) APP.switchTab("tab-voucher-form");
     },
 
     async handleSubmit() {
-        const user = APP.getCurrentUser();
+        const user = window.APP ? APP.getCurrentUser() : null;
         if (!user) {
-            APP.showToast("Please log in first.", "danger");
+            if (window.APP) APP.showToast("Please log in first.", "danger");
             return;
         }
 
@@ -303,3 +362,12 @@ const VOUCHER_CONTROLLER = {
     }
 };
 
+// Bind to window for global access
+window.VOUCHER_CONTROLLER = VOUCHER_CONTROLLER;
+
+// Auto-init when DOM ready
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => VOUCHER_CONTROLLER.init());
+} else {
+    VOUCHER_CONTROLLER.init();
+}
