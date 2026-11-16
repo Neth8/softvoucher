@@ -1,6 +1,7 @@
 /**
  * SoftCreation Voucher System
- * Application Configuration & Constants
+ * Application Configuration & Role Permissions Matrix
+ * Directly modeled from original index.html & codegogglescript.gs
  */
 const CONFIG = {
     SUPABASE_URL: "https://qyxgamverzdmhtvezbft.supabase.co",
@@ -16,13 +17,7 @@ const CONFIG = {
     STORAGE_BUCKET: "voucher-bills",
 
     OWNER_EMAIL: "systemadmin.softcreation@gmail.com",
-    APPROVER_ROLES: ["Owner", "CFO", "CEO", "Admin"],
-    APPROVER_EMAILS: [
-        "kavini.softcreation@gmail.com",
-        "yachitha.softcreation@gmail.com",
-        "madumali.softcreation@gmail.com"
-    ],
-
+    
     BANKS: [
         "People's Bank 226100130071423",
         "BOC 92746436",
@@ -49,18 +44,133 @@ const CONFIG = {
     PAGE_SIZE: 15
 };
 
-// Check if user has approval privileges
+/**
+ * Exact Role & Email Permissions Matrix
+ * Reconstructed from:
+ * - index.html lines 661-677
+ * - indexgooglescript.html lines 799-820
+ * - codegogglescript.gs lines 133-135 & 306
+ *
+ * Rules:
+ * - Owner (systemadmin.softcreation@gmail.com): Full access to everything + Maintenance mode
+ * - CFO (e.g. yachitha@..., madumali@...): Submit, Approve, Audit/Ledger, All Bills, Reports
+ * - CEO (e.g. kavini.softcreation@gmail.com): Approve, Audit/Ledger, All Bills, Reports (Does NOT submit vouchers)
+ * - Admin: Submit, Audit, All Bills. Only madumali.softcreation@gmail.com can Approve!
+ * - Auditor: Audit/Ledger, All Bills, Reports (Does NOT submit vouchers, does NOT approve)
+ * - User: Submit, View only own vouchers ("My Vouchers")
+ */
+function getUserPermissions(user) {
+    if (!user) {
+        return {
+            role: "Guest",
+            email: "",
+            canSubmit: false,
+            canApprove: false,
+            canViewAudit: false,
+            canViewAllBills: false,
+            isOwner: false,
+            defaultTab: "tab-ledger"
+        };
+    }
+
+    const email = (user.email || "").toLowerCase().trim();
+    const role = (user.role || "User").trim();
+
+    let showForm = false;
+    let showApprovals = false;
+    let showAudit = false;
+    let showAllBills = false;
+    let isOwner = false;
+
+    // 1. OWNER
+    if (role === "Owner" || email === CONFIG.OWNER_EMAIL.toLowerCase()) {
+        showForm = true;
+        showApprovals = true;
+        showAudit = true;
+        showAllBills = true;
+        isOwner = true;
+    }
+    // 2. ADMIN
+    else if (role === "Admin") {
+        showForm = true;
+        showAllBills = true;
+        showAudit = true;
+        // In original system: ONLY show approvals if the admin is Madumali
+        if (email === "madumali.softcreation@gmail.com") {
+            showApprovals = true;
+        }
+    }
+    // 3. CFO
+    else if (role === "CFO") {
+        showForm = true;
+        showApprovals = true;
+        showAllBills = true;
+        showAudit = true;
+    }
+    // 4. CEO (e.g. Kavini)
+    // Original system: showApprovals = true, showAllBills = true, showForm = false
+    else if (role === "CEO") {
+        showForm = false; // CEO reviews and approves; executive role does not submit vouchers
+        showApprovals = true;
+        showAllBills = true;
+        showAudit = true;
+    }
+    // 5. AUDITOR
+    // Original system: showAudit = true, showAllBills = true, showForm = false, showApprovals = false
+    else if (role === "Auditor") {
+        showForm = false;
+        showApprovals = false;
+        showAudit = true;
+        showAllBills = true;
+    }
+    // 6. STANDARD USER
+    else {
+        showForm = true;
+        showApprovals = false;
+        showAudit = false; // Only see own vouchers
+        showAllBills = false;
+    }
+
+    // Default Landing Tab based on role
+    let defaultTab = "tab-ledger";
+    if (role === "CEO" || (!showForm && showApprovals)) {
+        defaultTab = "tab-approvals";
+    } else if (role === "Auditor") {
+        defaultTab = "tab-ledger";
+    } else if (showForm) {
+        defaultTab = "tab-ledger";
+    }
+
+    return {
+        role,
+        email,
+        isOwner,
+        canSubmit: showForm,
+        canApprove: showApprovals,
+        canViewAudit: showAudit,
+        canViewAllBills: showAllBills,
+        defaultTab
+    };
+}
+
+// Helper wrapper functions
 function canUserApprove(user) {
     if (!user) return false;
-    const roleMatch = CONFIG.APPROVER_ROLES.some(r => (user.role || '').toLowerCase() === r.toLowerCase());
-    const emailMatch = CONFIG.APPROVER_EMAILS.some(e => (user.email || '').toLowerCase() === e.toLowerCase());
-    const ownerMatch = (user.email || '').toLowerCase() === CONFIG.OWNER_EMAIL.toLowerCase();
-    return roleMatch || emailMatch || ownerMatch;
+    return getUserPermissions(user).canApprove;
 }
 
-// Check if user is system owner
+function canUserSubmit(user) {
+    if (!user) return false;
+    return getUserPermissions(user).canSubmit;
+}
+
 function isSystemOwner(user) {
     if (!user) return false;
-    return (user.email || '').toLowerCase() === CONFIG.OWNER_EMAIL.toLowerCase() || (user.role || '').toLowerCase() === 'owner';
+    return getUserPermissions(user).isOwner;
 }
 
+window.CONFIG = CONFIG;
+window.getUserPermissions = getUserPermissions;
+window.canUserApprove = canUserApprove;
+window.canUserSubmit = canUserSubmit;
+window.isSystemOwner = isSystemOwner;

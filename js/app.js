@@ -125,23 +125,44 @@ const APP = {
         document.getElementById("sidebarUserEmail").innerText = user.email;
         document.getElementById("sidebarUserRole").innerText = user.role || "User";
 
-        const isApprover = canUserApprove(user);
-        const isOwner = isSystemOwner(user);
+        const perms = getUserPermissions(user);
 
-        // Toggle approvals tab visibility
+        // 1. New Voucher tab & buttons (Hidden for CEO & Auditor)
+        const newVoucherNav = document.getElementById("navNewVoucher");
+        if (newVoucherNav) newVoucherNav.classList.toggle("d-none", !perms.canSubmit);
+
+        const newVoucherBtn = document.getElementById("btnLedgerNewVoucher");
+        if (newVoucherBtn) newVoucherBtn.classList.toggle("d-none", !perms.canSubmit);
+
+        // 2. Approvals tab (Owner, CFO, CEO, and madumali.softcreation@gmail.com)
         const approvalsNav = document.getElementById("navApprovals");
-        if (approvalsNav) {
-            approvalsNav.classList.toggle("d-none", !isApprover);
+        if (approvalsNav) approvalsNav.classList.toggle("d-none", !perms.canApprove);
+
+        // 3. Receipts Gallery tab
+        const galleryNav = document.getElementById("navGallery");
+        if (galleryNav) galleryNav.classList.toggle("d-none", !perms.canViewAllBills && !perms.canSubmit);
+
+        // 4. Ledger Scope dropdown (All Vouchers vs My Vouchers)
+        const scopeSelect = document.getElementById("ledgerScope");
+        if (scopeSelect) {
+            if (!perms.canViewAudit) {
+                // Regular users can only see My Vouchers
+                scopeSelect.innerHTML = '<option value="MY" selected>My Vouchers</option>';
+                if (window.LEDGER_CONTROLLER) LEDGER_CONTROLLER.scope = "MY";
+            } else {
+                scopeSelect.innerHTML = '<option value="ALL" selected>All Vouchers (System Wide)</option><option value="MY">My Vouchers</option>';
+                if (window.LEDGER_CONTROLLER) LEDGER_CONTROLLER.scope = "ALL";
+            }
         }
 
-        // Toggle Maintenance control visibility in settings
+        // 5. Maintenance control in Settings (Owner only)
         const maintArea = document.getElementById("maintenanceControlArea");
         if (maintArea) {
-            maintArea.classList.toggle("d-none", !isOwner);
+            maintArea.classList.toggle("d-none", !perms.isOwner);
         }
 
-        // Default to ledger or form
-        this.switchTab("tab-ledger");
+        // 6. Navigate to role-specific default tab (CEO lands on Approvals, Others on Ledger)
+        this.switchTab(perms.defaultTab);
         this.loadSettingsStats();
     },
 
@@ -163,10 +184,34 @@ const APP = {
     },
 
     switchTab(tabId) {
+        // Security check for tab access based on permissions
+        const perms = this.currentUser ? getUserPermissions(this.currentUser) : null;
+        if (tabId === "tab-voucher-form" && perms && !perms.canSubmit) {
+            this.showToast("Your role does not have permission to submit vouchers.", "warning");
+            tabId = perms.defaultTab;
+        }
+        if (tabId === "tab-approvals" && perms && !perms.canApprove) {
+            this.showToast("Your role does not have approval privileges.", "warning");
+            tabId = perms.defaultTab;
+        }
+
         // Update nav buttons
         document.querySelectorAll(".sidebar-nav-btn").forEach(btn => {
             btn.classList.toggle("active", btn.dataset.tab === tabId);
         });
+
+        // Update topbar breadcrumb
+        const viewNames = {
+            "tab-ledger": "Voucher Records",
+            "tab-voucher-form": "New Voucher",
+            "tab-approvals": "Approvals Hub",
+            "tab-gallery": "Receipts Gallery",
+            "tab-reports": "Reports & Analytics"
+        };
+        const titleEl = document.getElementById("topbarActiveView");
+        if (titleEl && viewNames[tabId]) {
+            titleEl.innerText = viewNames[tabId];
+        }
 
         // Update tab views
         document.querySelectorAll(".tab-view").forEach(view => {

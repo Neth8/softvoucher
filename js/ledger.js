@@ -58,7 +58,7 @@ const LEDGER_CONTROLLER = {
 
     setStatusFilter(status) {
         this.currentStatus = status;
-        document.querySelectorAll(".ledger-status-pill").forEach(btn => {
+        document.querySelectorAll(".filter-pill, .ledger-status-pill").forEach(btn => {
             btn.classList.toggle("active", btn.dataset.status === status);
         });
         this.fetchData(1);
@@ -69,7 +69,7 @@ const LEDGER_CONTROLLER = {
         document.getElementById("ledgerSearchDate").value = "";
         document.getElementById("ledgerSearchType").value = "ALL";
         this.currentStatus = "ALL";
-        document.querySelectorAll(".ledger-status-pill").forEach(btn => {
+        document.querySelectorAll(".filter-pill, .ledger-status-pill").forEach(btn => {
             btn.classList.toggle("active", btn.dataset.status === "ALL");
         });
         this.fetchData(1);
@@ -144,9 +144,11 @@ const LEDGER_CONTROLLER = {
                 </button>
             `;
 
-            // Edit button if PENDING or REJECTED
-            if (rec.status === "PENDING" || rec.status === "REJECTED") {
-                if (rec.userEmail === user.email || canApprove) {
+            const perms = getUserPermissions(user);
+
+            // Edit button if PENDING or REJECTED (only for roles with submit permission)
+            if ((rec.status === "PENDING" || rec.status === "REJECTED") && perms.canSubmit) {
+                if (rec.userEmail === user.email || perms.isOwner || perms.isCFO) {
                     actionButtons += `
                         <button class="btn btn-sm btn-outline-warning ms-1" onclick="LEDGER_CONTROLLER.triggerEdit('${rec.voucherNo}')" title="Edit Voucher">
                             <i class="bi bi-pencil"></i>
@@ -155,8 +157,8 @@ const LEDGER_CONTROLLER = {
                 }
             }
 
-            // Revert Approval button (Approver privileges only)
-            if (rec.status === "APPROVED" && canApprove) {
+            // Revert Approval button (Approver privileges only: Owner, CFO, CEO, Madumali)
+            if (rec.status === "APPROVED" && perms.canApprove) {
                 actionButtons += `
                     <button class="btn btn-sm btn-outline-secondary ms-1" onclick="LEDGER_CONTROLLER.triggerRevert('${rec.voucherNo}')" title="Revert Approval">
                         <i class="bi bi-arrow-counterclockwise"></i>
@@ -176,11 +178,11 @@ const LEDGER_CONTROLLER = {
 
             html += `
                 <tr>
-                    <td class="fw-bold text-primary font-monospace">${rec.voucherNo}</td>
-                    <td>${rec.date}</td>
-                    <td><span class="badge bg-secondary bg-opacity-25 text-body">${rec.type}</span></td>
+                    <td class="voucher-no-cell">#${rec.voucherNo}</td>
+                    <td class="fw-semibold text-secondary">${rec.date}</td>
+                    <td><span class="badge bg-secondary bg-opacity-10 text-body border border-secondary border-opacity-25 py-1 px-2">${rec.type}</span></td>
                     <td class="small text-truncate" style="max-width: 180px;" title="${rec.bank}">${rec.bank}</td>
-                    <td class="fw-bold text-end">Rs. ${rec.amount.toLocaleString("en-LK", { minimumFractionDigits: 2 })}</td>
+                    <td class="amount-cell text-end">Rs. ${rec.amount.toLocaleString("en-LK", { minimumFractionDigits: 2 })}</td>
                     <td class="text-center">${billsBadge}</td>
                     <td class="text-center">${statusBadge}</td>
                     <td class="text-end text-nowrap">${actionButtons}</td>
@@ -194,11 +196,11 @@ const LEDGER_CONTROLLER = {
     getStatusBadge(status) {
         switch (status) {
             case "APPROVED":
-                return '<span class="badge bg-success bg-opacity-75"><i class="bi bi-check-circle me-1"></i> Approved</span>';
+                return '<span class="badge-status-approved"><i class="bi bi-check-circle-fill"></i> Approved</span>';
             case "REJECTED":
-                return '<span class="badge bg-danger bg-opacity-75"><i class="bi bi-x-circle me-1"></i> Rejected</span>';
+                return '<span class="badge-status-rejected"><i class="bi bi-x-circle-fill"></i> Rejected</span>';
             default:
-                return '<span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i> Pending</span>';
+                return '<span class="badge-status-pending"><i class="bi bi-clock-fill"></i> Pending</span>';
         }
     },
 
