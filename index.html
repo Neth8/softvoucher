@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SoftCreation Voucher System</title>
-    
+
     <!-- Bootstrap 5.3 & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    
+
     <!-- Application CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
     <!-- 1. FULLSCREEN LOGIN SCREEN -->
@@ -23,10 +25,12 @@
                 <p class="text-muted small">Financial Voucher & Payment System</p>
             </div>
             <div class="mb-3">
-                <label for="loginIdentifier" class="form-label small fw-bold text-muted text-uppercase">Email or Username</label>
+                <label for="loginIdentifier" class="form-label small fw-bold text-muted text-uppercase">Email or
+                    Username</label>
                 <div class="input-group">
                     <span class="input-group-text bg-body-tertiary"><i class="bi bi-person"></i></span>
-                    <input type="text" class="form-control" id="loginIdentifier" placeholder="name@softcreation.com" autocomplete="username">
+                    <input type="text" class="form-control" id="loginIdentifier" placeholder="name@softcreation.com"
+                        autocomplete="username">
                 </div>
                 <div id="loginErrorMsg" class="text-danger small mt-2 fw-semibold"></div>
             </div>
@@ -63,12 +67,14 @@
 
             <!-- User Info Pill -->
             <div class="p-2 mb-3 rounded-3 bg-body-tertiary border d-flex align-items-center gap-2">
-                <div class="rounded-circle bg-success bg-opacity-25 text-success d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <div class="rounded-circle bg-success bg-opacity-25 text-success d-flex align-items-center justify-content-center"
+                    style="width: 36px; height: 36px;">
                     <i class="bi bi-person-fill"></i>
                 </div>
                 <div class="overflow-hidden">
                     <div class="fw-bold small text-truncate" id="sidebarUserEmail">User</div>
-                    <span class="badge bg-secondary bg-opacity-25 text-body py-0 px-2 small" id="sidebarUserRole">Role</span>
+                    <span class="badge bg-secondary bg-opacity-25 text-body py-0 px-2 small"
+                        id="sidebarUserRole">Role</span>
                 </div>
             </div>
 
@@ -84,7 +90,8 @@
                     <span>New Voucher</span>
                 </button>
 
-                <button class="sidebar-nav-btn d-none" id="navApprovals" data-tab="tab-approvals" onclick="APP.switchTab('tab-approvals')">
+                <button class="sidebar-nav-btn d-none" id="navApprovals" data-tab="tab-approvals"
+                    onclick="APP.switchTab('tab-approvals')">
                     <i class="bi bi-shield-check"></i>
                     <span>Approvals</span>
                     <span class="badge bg-danger rounded-pill ms-auto d-none" id="badgePendingApprovals">0</span>
@@ -114,7 +121,7 @@
 
         <!-- MAIN CONTENT AREA -->
         <main id="mainContent">
-            
+
             <div class="content-viewport">
 
                 <!-- TAB 1: VOUCHER LEDGER (PAGINATED TABLE) -->
@@ -126,8 +133,8 @@
                         </div>
                         <div class="d-flex gap-2">
                             <select id="ledgerScope" class="form-select form-select-sm w-auto fw-bold border-primary">
+                                <option value="ALL" selected>All Vouchers (System Wide)</option>
                                 <option value="MY">My Vouchers</option>
-                                <option value="ALL">All Vouchers (Audit)</option>
                             </select>
                             <button class="btn btn-primary btn-sm fw-bold" onclick="APP.switchTab('tab-voucher-form')">
                                 <i class="bi bi-plus-lg me-1"></i> New Voucher
@@ -138,16 +145,21 @@
                     <!-- Filter Bar -->
                     <div class="card card-custom p-3 mb-4">
                         <div class="d-flex flex-wrap gap-2 mb-3">
-                            <button class="btn btn-sm btn-outline-secondary ledger-status-pill active" data-status="ALL" onclick="LEDGER_CONTROLLER.setStatusFilter('ALL')">All</button>
-                            <button class="btn btn-sm btn-outline-warning ledger-status-pill" data-status="PENDING" onclick="LEDGER_CONTROLLER.setStatusFilter('PENDING')">Pending</button>
-                            <button class="btn btn-sm btn-outline-success ledger-status-pill" data-status="APPROVED" onclick="LEDGER_CONTROLLER.setStatusFilter('APPROVED')">Approved</button>
-                            <button class="btn btn-sm btn-outline-danger ledger-status-pill" data-status="REJECTED" onclick="LEDGER_CONTROLLER.setStatusFilter('REJECTED')">Rejected</button>
+                            <button class="btn btn-sm btn-outline-secondary ledger-status-pill active" data-status="ALL"
+                                onclick="LEDGER_CONTROLLER.setStatusFilter('ALL')">All</button>
+                            <button class="btn btn-sm btn-outline-warning ledger-status-pill" data-status="PENDING"
+                                onclick="LEDGER_CONTROLLER.setStatusFilter('PENDING')">Pending</button>
+                            <button class="btn btn-sm btn-outline-success ledger-status-pill" data-status="APPROVED"
+                                onclick="LEDGER_CONTROLLER.setStatusFilter('APPROVED')">Approved</button>
+                            <button class="btn btn-sm btn-outline-danger ledger-status-pill" data-status="REJECTED"
+                                onclick="LEDGER_CONTROLLER.setStatusFilter('REJECTED')">Rejected</button>
                         </div>
                         <div class="row g-2 align-items-center">
                             <div class="col-md-3">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                    <input type="text" class="form-control" id="ledgerSearchVoucher" placeholder="Search Voucher #...">
+                                    <input type="text" class="form-control" id="ledgerSearchVoucher"
+                                        placeholder="Search Voucher #...">
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -157,7 +169,8 @@
                                 <select class="form-select form-select-sm" id="ledgerSearchType"></select>
                             </div>
                             <div class="col-md-3 d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-secondary w-100" onclick="LEDGER_CONTROLLER.clearFilters()">
+                                <button class="btn btn-sm btn-outline-secondary w-100"
+                                    onclick="LEDGER_CONTROLLER.clearFilters()">
                                     <i class="bi bi-x-circle me-1"></i> Reset
                                 </button>
                                 <select class="form-select form-select-sm w-auto" id="ledgerPageSize" title="Page size">
@@ -207,7 +220,8 @@
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div>
                                 <h3 class="fw-bold mb-1" id="formTitle">🧾 Submit Payment Voucher</h3>
-                                <p class="text-muted small mb-0">Fill in the expense details and upload supporting bills.</p>
+                                <p class="text-muted small mb-0">Fill in the expense details and upload supporting
+                                    bills.</p>
                             </div>
                             <button class="btn btn-outline-secondary btn-sm" id="btnResetForm">
                                 <i class="bi bi-arrow-clockwise me-1"></i> Reset Form
@@ -217,8 +231,11 @@
                         <div class="card card-custom p-4">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Voucher Number</label>
-                                    <input type="text" class="form-control fw-bold font-monospace text-primary bg-body-tertiary" id="formVoucherNo" readonly value="Select date first...">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Voucher
+                                        Number</label>
+                                    <input type="text"
+                                        class="form-control fw-bold font-monospace text-primary bg-body-tertiary"
+                                        id="formVoucherNo" readonly value="Select date first...">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold text-muted text-uppercase">Date</label>
@@ -226,45 +243,57 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Bank / Payment Method</label>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Bank / Payment
+                                        Method</label>
                                     <select class="form-select" id="formBank"></select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Expense Type</label>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Expense
+                                        Type</label>
                                     <select class="form-select" id="formType"></select>
                                 </div>
 
                                 <div class="col-md-6 d-none" id="empNoContainer">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Employee Number</label>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Employee
+                                        Number</label>
                                     <input type="text" class="form-control" id="formEmpNo" placeholder="e.g. EMP001">
                                 </div>
                                 <div class="col-md-6 d-none" id="otherTypeContainer">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Specify Expense Type</label>
-                                    <input type="text" class="form-control" id="formOtherType" placeholder="Specify expense category...">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Specify Expense
+                                        Type</label>
+                                    <input type="text" class="form-control" id="formOtherType"
+                                        placeholder="Specify expense category...">
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Amount (LKR)</label>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Amount
+                                        (LKR)</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-body-tertiary fw-bold">Rs.</span>
-                                        <input type="number" step="0.01" class="form-control fs-5 fw-bold" id="formAmount" placeholder="0.00">
+                                        <input type="number" step="0.01" class="form-control fs-5 fw-bold"
+                                            id="formAmount" placeholder="0.00">
                                     </div>
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Description / Note</label>
-                                    <textarea class="form-control" id="formNote" rows="2" placeholder="Explain the purpose of this voucher..."></textarea>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Description /
+                                        Note</label>
+                                    <textarea class="form-control" id="formNote" rows="2"
+                                        placeholder="Explain the purpose of this voucher..."></textarea>
                                 </div>
 
                                 <!-- File Attachments -->
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Attach Supporting Bills (Images / PDF)</label>
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Attach Supporting
+                                        Bills (Images / PDF)</label>
                                     <div class="d-flex flex-wrap gap-2" id="filePreviewArea">
                                         <!-- Dynamic preview cards -->
                                     </div>
-                                    <input type="file" id="fileInput" class="d-none" multiple accept="image/*,application/pdf">
+                                    <input type="file" id="fileInput" class="d-none" multiple
+                                        accept="image/*,application/pdf">
                                     <div class="form-text small text-muted mt-2">
-                                        Files are securely uploaded directly to cloud storage. You can attach multiple receipts.
+                                        Files are securely uploaded directly to cloud storage. You can attach multiple
+                                        receipts.
                                     </div>
                                 </div>
                             </div>
@@ -273,7 +302,8 @@
                                 <button class="btn btn-primary w-100 py-2 fs-6 fw-bold shadow-sm" id="btnSubmitVoucher">
                                     Submit for Approval
                                 </button>
-                                <button class="btn btn-outline-secondary w-100 mt-2 py-2 d-none" id="btnCancelEdit" onclick="VOUCHER_CONTROLLER.resetForm()">
+                                <button class="btn btn-outline-secondary w-100 mt-2 py-2 d-none" id="btnCancelEdit"
+                                    onclick="VOUCHER_CONTROLLER.resetForm()">
                                     Cancel Edit
                                 </button>
                             </div>
@@ -286,23 +316,28 @@
                     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
                         <div>
                             <h3 class="fw-bold mb-1">🛡️ Approvals Hub</h3>
-                            <p class="text-muted small mb-0">Review pending voucher submissions and approve in batch or individually.</p>
+                            <p class="text-muted small mb-0">Review pending voucher submissions and approve in batch or
+                                individually.</p>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <button class="btn btn-success btn-sm fw-bold d-none" id="btnBulkApprove">
-                                <i class="bi bi-check2-all me-1"></i> Approve Selected (<span id="selectedApprovalsCount">0</span>)
+                                <i class="bi bi-check2-all me-1"></i> Approve Selected (<span
+                                    id="selectedApprovalsCount">0</span>)
                             </button>
-                            <button class="btn btn-outline-secondary btn-sm" onclick="APPROVALS_CONTROLLER.fetchPending()">
+                            <button class="btn btn-outline-secondary btn-sm"
+                                onclick="APPROVALS_CONTROLLER.fetchPending()">
                                 <i class="bi bi-arrow-clockwise me-1"></i> Refresh
                             </button>
                         </div>
                     </div>
 
                     <!-- Batch Select Header -->
-                    <div class="p-3 mb-3 rounded-3 bg-body-tertiary border d-flex align-items-center justify-content-between">
+                    <div
+                        class="p-3 mb-3 rounded-3 bg-body-tertiary border d-flex align-items-center justify-content-between">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="selectAllApprovals">
-                            <label class="form-check-label fw-bold small text-muted" for="selectAllApprovals">Select All Pending</label>
+                            <label class="form-check-label fw-bold small text-muted" for="selectAllApprovals">Select All
+                                Pending</label>
                         </div>
                         <span class="small text-muted">Authorized Approver View</span>
                     </div>
@@ -326,7 +361,8 @@
                             <div class="col-md-6">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                    <input type="text" class="form-control" id="gallerySearchVoucher" placeholder="Filter by Voucher #...">
+                                    <input type="text" class="form-control" id="gallerySearchVoucher"
+                                        placeholder="Filter by Voucher #...">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -380,8 +416,10 @@
                         <!-- Monthly Report PDF -->
                         <div class="col-md-6">
                             <div class="card card-custom p-4 h-100">
-                                <h5 class="fw-bold mb-2"><i class="bi bi-file-earmark-pdf text-danger me-2"></i> Monthly Expense Report</h5>
-                                <p class="text-muted small mb-3">Generates a branded, corporate-grade PDF summarizing all approved expenses for a month.</p>
+                                <h5 class="fw-bold mb-2"><i class="bi bi-file-earmark-pdf text-danger me-2"></i> Monthly
+                                    Expense Report</h5>
+                                <p class="text-muted small mb-3">Generates a branded, corporate-grade PDF summarizing
+                                    all approved expenses for a month.</p>
                                 <div class="input-group mb-3">
                                     <input type="month" class="form-control" id="reportMonthSelect">
                                     <button class="btn btn-primary fw-bold" id="btnGenerateMonthlyReport">
@@ -389,7 +427,8 @@
                                     </button>
                                 </div>
                                 <div class="small text-muted mt-auto pt-2 border-top">
-                                    <i class="bi bi-info-circle me-1"></i> Generated instantly in browser via jsPDF. No server wait times.
+                                    <i class="bi bi-info-circle me-1"></i> Generated instantly in browser via jsPDF. No
+                                    server wait times.
                                 </div>
                             </div>
                         </div>
@@ -397,13 +436,16 @@
                         <!-- Database Backup -->
                         <div class="col-md-6">
                             <div class="card card-custom p-4 h-100">
-                                <h5 class="fw-bold mb-2"><i class="bi bi-filetype-csv text-success me-2"></i> Database Export & Backup</h5>
-                                <p class="text-muted small mb-3">Download the full database as an Excel-friendly CSV with all voucher details.</p>
+                                <h5 class="fw-bold mb-2"><i class="bi bi-filetype-csv text-success me-2"></i> Database
+                                    Export & Backup</h5>
+                                <p class="text-muted small mb-3">Download the full database as an Excel-friendly CSV
+                                    with all voucher details.</p>
                                 <button class="btn btn-outline-success fw-bold w-100 py-2" id="btnExportCsv">
                                     <i class="bi bi-download me-1"></i> Download Database (CSV)
                                 </button>
                                 <div class="small text-muted mt-auto pt-2 border-top">
-                                    <i class="bi bi-check-circle me-1"></i> Compatible with Excel, Google Sheets, and financial software.
+                                    <i class="bi bi-check-circle me-1"></i> Compatible with Excel, Google Sheets, and
+                                    financial software.
                                 </div>
                             </div>
                         </div>
@@ -413,8 +455,10 @@
                             <div class="card card-custom p-4 border-warning">
                                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                                     <div>
-                                        <h5 class="fw-bold text-warning mb-1"><i class="bi bi-shield-lock me-2"></i> System Maintenance Mode</h5>
-                                        <p class="text-muted small mb-0">When enabled, regular users cannot log in. Only System Admin has access.</p>
+                                        <h5 class="fw-bold text-warning mb-1"><i class="bi bi-shield-lock me-2"></i>
+                                            System Maintenance Mode</h5>
+                                        <p class="text-muted small mb-0">When enabled, regular users cannot log in. Only
+                                            System Admin has access.</p>
                                     </div>
                                     <div class="form-check form-switch fs-4">
                                         <input class="form-check-input" type="checkbox" id="switchMaintenance">
@@ -444,7 +488,8 @@
                             <h4 class="fw-bold mb-0 text-success">SoftCreation (Pvt) Ltd.</h4>
                         </div>
                         <div class="col-5 text-end">
-                            <h3 class="fw-bold text-uppercase mb-1 tracking-wider text-muted" style="letter-spacing: 2px;">Payment Voucher</h3>
+                            <h3 class="fw-bold text-uppercase mb-1 tracking-wider text-muted"
+                                style="letter-spacing: 2px;">Payment Voucher</h3>
                             <div class="badge fs-6" id="pvStatus"></div>
                         </div>
                     </div>
@@ -453,7 +498,8 @@
                     <div class="row mb-4 p-3 rounded bg-body-tertiary">
                         <div class="col-6">
                             <p class="mb-1 text-uppercase small text-muted fw-bold">Voucher Details</p>
-                            <p class="mb-1"><strong>Voucher No:</strong> <span id="pvVoucherNo" class="fw-bold text-success font-monospace"></span></p>
+                            <p class="mb-1"><strong>Voucher No:</strong> <span id="pvVoucherNo"
+                                    class="fw-bold text-success font-monospace"></span></p>
                             <p class="mb-0"><strong>Date:</strong> <span id="pvDate"></span></p>
                         </div>
                         <div class="col-6 text-end">
@@ -502,7 +548,8 @@
                     <div class="mt-4 pt-3 border-top border-dashed no-print d-none" id="pvBillLinks"></div>
                 </div>
                 <div class="modal-footer no-print border-top-0 bg-body-tertiary">
-                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close Window</button>
+                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close
+                        Window</button>
                     <button type="button" class="btn btn-primary fw-bold" onclick="window.print()">
                         <i class="bi bi-file-earmark-pdf-fill me-1"></i> Save as PDF / Print
                     </button>
@@ -516,16 +563,19 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-danger"><i class="bi bi-x-circle me-1"></i> Reject Voucher #<span id="rejectVoucherNoLabel"></span></h5>
+                    <h5 class="modal-title fw-bold text-danger"><i class="bi bi-x-circle me-1"></i> Reject Voucher
+                        #<span id="rejectVoucherNoLabel"></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <label class="form-label small fw-bold text-muted text-uppercase">Rejection Reason</label>
-                    <textarea class="form-control" id="rejectReasonInput" rows="3" placeholder="Explain why this voucher is being rejected..."></textarea>
+                    <textarea class="form-control" id="rejectReasonInput" rows="3"
+                        placeholder="Explain why this voucher is being rejected..."></textarea>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger fw-bold" id="btnConfirmReject">Confirm Rejection</button>
+                    <button type="button" class="btn btn-danger fw-bold" id="btnConfirmReject">Confirm
+                        Rejection</button>
                 </div>
             </div>
         </div>
@@ -540,14 +590,18 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4 text-center">
-                    <img id="lightboxImage" src="" alt="Receipt" class="img-fluid rounded-3 shadow-sm d-none" style="max-height: 75vh;">
-                    <iframe id="lightboxFrame" src="" class="w-100 rounded-3 border d-none" style="height: 75vh;"></iframe>
+                    <img id="lightboxImage" src="" alt="Receipt" class="img-fluid rounded-3 shadow-sm d-none"
+                        style="max-height: 75vh;">
+                    <iframe id="lightboxFrame" src="" class="w-100 rounded-3 border d-none"
+                        style="height: 75vh;"></iframe>
                 </div>
                 <div class="modal-footer border-top-0 pt-0">
-                    <a id="lightboxOpenOriginal" href="#" target="_blank" class="btn btn-sm btn-outline-primary fw-bold">
+                    <a id="lightboxOpenOriginal" href="#" target="_blank"
+                        class="btn btn-sm btn-outline-primary fw-bold">
                         <i class="bi bi-box-arrow-up-right me-1"></i> Open Original Link
                     </a>
-                    <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-sm btn-secondary fw-bold"
+                        data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -574,5 +628,5 @@
     <script src="js/app.js"></script>
 
 </body>
-</html>
 
+</html>

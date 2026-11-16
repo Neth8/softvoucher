@@ -7,7 +7,7 @@ const LEDGER_CONTROLLER = {
     currentPage: 1,
     pageSize: CONFIG.PAGE_SIZE,
     currentStatus: "ALL",
-    scope: "MY", // "MY" or "ALL"
+    scope: "ALL", // Default to "ALL" so users immediately see existing database records
     records: [],
     totalRecords: 0,
     totalPages: 1,
@@ -123,7 +123,10 @@ const LEDGER_CONTROLLER = {
         if (!tbody) return;
 
         if (this.records.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-2 d-block mb-2"></i> No vouchers match your filters.</td></tr>`;
+            const scopeNote = this.scope === "MY"
+                ? `<p class="small mt-1">You are currently viewing <b>My Vouchers</b>. <a href="#" class="text-primary fw-bold" onclick="document.getElementById('ledgerScope').value='ALL';LEDGER_CONTROLLER.scope='ALL';LEDGER_CONTROLLER.fetchData(1);return false;">Click here to switch to All Vouchers</a>.</p>`
+                : `<p class="small mt-1">Check your search criteria or verify that tables and RLS permissions are configured in Supabase.</p>`;
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-2 d-block mb-2"></i> No vouchers found.${scopeNote}</td></tr>`;
             return;
         }
 
