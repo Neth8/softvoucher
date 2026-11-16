@@ -57,17 +57,25 @@
     <!-- 4. APP SHELL CONTAINER -->
     <div id="appContainer" class="d-none">
 
+        <!-- Mobile Drawer Backdrop Overlay -->
+        <div id="sidebarBackdrop" class="sidebar-backdrop d-lg-none d-none" onclick="APP.closeMobileSidebar()"></div>
+
         <!-- SIDEBAR -->
         <aside id="sidebar">
-            <!-- Brand Header: Clean logo, no duplicate SoftCreation text -->
-            <div class="brand-header">
-                <div class="brand-logo-container">
-                    <img src="https://i.imgur.com/MkCwuBP.png" alt="SoftCreation" class="brand-logo">
+            <!-- Brand Header: Clean logo with mobile close button -->
+            <div class="brand-header d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="brand-logo-container">
+                        <img src="https://i.imgur.com/MkCwuBP.png" alt="SoftCreation" class="brand-logo">
+                    </div>
+                    <div class="brand-badge-row">
+                        <span class="brand-app-name">Voucher System</span>
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2 py-0">v2.0</span>
+                    </div>
                 </div>
-                <div class="brand-badge-row">
-                    <span class="brand-app-name">Voucher System</span>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2 py-0">v2.0</span>
-                </div>
+                <button class="btn btn-sm btn-icon d-lg-none text-muted p-1" onclick="APP.closeMobileSidebar()" aria-label="Close navigation">
+                    <i class="bi bi-x-lg fs-5"></i>
+                </button>
             </div>
 
             <!-- User Info Pill -->
@@ -129,19 +137,24 @@
 
             <!-- App Topbar -->
             <header class="app-topbar">
-                <div class="topbar-breadcrumb">
-                    <span class="text-muted small">Financial Operations</span>
-                    <span class="mx-2 text-muted opacity-50">/</span>
-                    <span class="fw-bold small" id="topbarActiveView">Voucher Ledger</span>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-secondary d-lg-none me-1 p-1 px-2 border" id="btnMobileSidebarToggle" onclick="APP.toggleMobileSidebar()" aria-label="Toggle navigation">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                    <div class="topbar-breadcrumb">
+                        <span class="text-muted small d-none d-sm-inline">Financial Operations</span>
+                        <span class="mx-2 text-muted opacity-50 d-none d-sm-inline">/</span>
+                        <span class="fw-bold small" id="topbarActiveView">Voucher Ledger</span>
+                    </div>
                 </div>
-                <div class="d-flex align-items-center gap-3">
-                    <div class="d-none d-sm-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-body-tertiary border">
+                <div class="d-flex align-items-center gap-2 gap-sm-3">
+                    <div class="d-none d-md-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-body-tertiary border">
                         <span class="status-pulse-dot"></span>
                         <span class="small fw-semibold text-muted" style="font-size: 0.72rem;">Supabase Connected</span>
                     </div>
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-flex align-items-center gap-2" id="btnTopThemeToggle" onclick="APP.toggleTheme()" title="Switch Theme">
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-2 px-sm-3 d-flex align-items-center gap-1 gap-sm-2" id="btnTopThemeToggle" onclick="APP.toggleTheme()" title="Switch Theme">
                         <i class="bi bi-moon-stars-fill" id="topThemeIcon"></i>
-                        <span class="small fw-semibold d-none d-md-inline" id="topThemeLabel">Dark Mode</span>
+                        <span class="small fw-semibold d-none d-sm-inline" id="topThemeLabel">Dark Mode</span>
                     </button>
                 </div>
             </header>
@@ -432,25 +445,25 @@
 
                     <!-- Stats Cards -->
                     <div class="row g-3 mb-4">
-                        <div class="col-xl-3 col-sm-6">
+                        <div class="col-6 col-lg-3">
                             <div class="card card-custom p-3">
                                 <div class="text-muted small text-uppercase fw-bold">Total Vouchers</div>
                                 <div class="fs-2 fw-bold text-primary mt-1" id="statsTotalVouchers">...</div>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-sm-6">
+                        <div class="col-6 col-lg-3">
                             <div class="card card-custom p-3">
                                 <div class="text-muted small text-uppercase fw-bold">Pending Review</div>
                                 <div class="fs-2 fw-bold text-warning mt-1" id="statsPendingVouchers">...</div>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-sm-6">
+                        <div class="col-6 col-lg-3">
                             <div class="card card-custom p-3">
                                 <div class="text-muted small text-uppercase fw-bold">Approved</div>
                                 <div class="fs-2 fw-bold text-success mt-1" id="statsApprovedVouchers">...</div>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-sm-6">
+                        <div class="col-6 col-lg-3">
                             <div class="card card-custom p-3">
                                 <div class="text-muted small text-uppercase fw-bold">Rejected</div>
                                 <div class="fs-2 fw-bold text-danger mt-1" id="statsRejectedVouchers">...</div>
@@ -526,29 +539,29 @@
                 <div class="modal-header border-bottom-0 pb-0 no-print">
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-5" id="printableVoucherArea">
+                <div class="modal-body p-3 p-md-5" id="printableVoucherArea">
                     <!-- Enterprise Header -->
                     <div class="row mb-4 align-items-center">
-                        <div class="col-7 d-flex align-items-center gap-3">
-                            <img src="https://i.imgur.com/MkCwuBP.png" height="50" alt="Logo">
-                            <h4 class="fw-bold mb-0 text-success">SoftCreation (Pvt) Ltd.</h4>
+                        <div class="col-12 col-sm-7 d-flex align-items-center gap-2 gap-sm-3 mb-2 mb-sm-0">
+                            <img src="https://i.imgur.com/MkCwuBP.png" height="42" alt="Logo" style="max-width: 140px; object-fit: contain;">
+                            <h5 class="fw-bold mb-0 text-success fs-6 fs-sm-5">SoftCreation (Pvt) Ltd.</h5>
                         </div>
-                        <div class="col-5 text-end">
-                            <h3 class="fw-bold text-uppercase mb-1 tracking-wider text-muted"
-                                style="letter-spacing: 2px;">Payment Voucher</h3>
+                        <div class="col-12 col-sm-5 text-start text-sm-end">
+                            <h4 class="fw-bold text-uppercase mb-1 tracking-wider text-muted fs-5 fs-sm-4"
+                                style="letter-spacing: 2px;">Payment Voucher</h4>
                             <div class="badge fs-6" id="pvStatus"></div>
                         </div>
                     </div>
 
                     <!-- Metadata Block -->
-                    <div class="row mb-4 p-3 rounded bg-body-tertiary">
-                        <div class="col-6">
+                    <div class="row mb-4 p-3 rounded bg-body-tertiary g-2">
+                        <div class="col-12 col-sm-6">
                             <p class="mb-1 text-uppercase small text-muted fw-bold">Voucher Details</p>
                             <p class="mb-1"><strong>Voucher No:</strong> <span id="pvVoucherNo"
                                     class="fw-bold text-success font-monospace"></span></p>
                             <p class="mb-0"><strong>Date:</strong> <span id="pvDate"></span></p>
                         </div>
-                        <div class="col-6 text-end">
+                        <div class="col-12 col-sm-6 text-start text-sm-end mt-2 mt-sm-0">
                             <p class="mb-1 text-uppercase small text-muted fw-bold">Payment Summary</p>
                             <p class="mb-0 fs-3 text-success fw-bold" id="pvAmount"></p>
                         </div>
@@ -573,12 +586,12 @@
                     </table>
 
                     <!-- Digital Audit Trail -->
-                    <div class="row mt-5 pt-3 border-top">
-                        <div class="col-6">
+                    <div class="row mt-4 mt-md-5 pt-3 border-top g-2">
+                        <div class="col-12 col-sm-6">
                             <p class="text-muted small text-uppercase fw-bold mb-1">Prepared By (System User)</p>
                             <p class="mb-0 fw-bold" id="pvPreparedBy"></p>
                         </div>
-                        <div class="col-6 text-end" id="pvApprovedDetails">
+                        <div class="col-12 col-sm-6 text-start text-sm-end mt-2 mt-sm-0" id="pvApprovedDetails">
                             <!-- Approved or pending info -->
                         </div>
                     </div>
@@ -593,10 +606,9 @@
                     <!-- Attached Bill Links (Hidden in print) -->
                     <div class="mt-4 pt-3 border-top border-dashed no-print d-none" id="pvBillLinks"></div>
                 </div>
-                <div class="modal-footer no-print border-top-0 bg-body-tertiary">
-                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close
-                        Window</button>
-                    <button type="button" class="btn btn-primary fw-bold" onclick="window.print()">
+                <div class="modal-footer no-print border-top-0 bg-body-tertiary d-flex flex-column-reverse flex-sm-row justify-content-sm-end w-100 gap-2">
+                    <button type="button" class="btn btn-secondary fw-bold w-100 w-sm-auto" data-bs-dismiss="modal">Close Window</button>
+                    <button type="button" class="btn btn-primary fw-bold w-100 w-sm-auto" onclick="window.print()">
                         <i class="bi bi-file-earmark-pdf-fill me-1"></i> Save as PDF / Print
                     </button>
                 </div>

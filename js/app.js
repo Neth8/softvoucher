@@ -192,7 +192,31 @@ const APP = {
         return this.currentUser;
     },
 
+    toggleMobileSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const backdrop = document.getElementById("sidebarBackdrop");
+        if (sidebar) {
+            const isOpen = sidebar.classList.contains("mobile-open");
+            if (isOpen) {
+                this.closeMobileSidebar();
+            } else {
+                sidebar.classList.add("mobile-open");
+                if (backdrop) backdrop.classList.remove("d-none");
+            }
+        }
+    },
+
+    closeMobileSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const backdrop = document.getElementById("sidebarBackdrop");
+        if (sidebar) sidebar.classList.remove("mobile-open");
+        if (backdrop) backdrop.classList.add("d-none");
+    },
+
     switchTab(tabId) {
+        // Automatically close mobile sidebar on navigation
+        this.closeMobileSidebar();
+
         // Security check for tab access based on permissions
         const perms = this.currentUser ? getUserPermissions(this.currentUser) : null;
         if (tabId === "tab-voucher-form" && perms && !perms.canSubmit) {

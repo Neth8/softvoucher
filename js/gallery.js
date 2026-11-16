@@ -109,7 +109,7 @@ const GALLERY_CONTROLLER = {
                 : `<img src="${item.url}" alt="Receipt" loading="lazy" class="gallery-img">`;
 
             html += `
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="card card-custom h-100 gallery-card shadow-sm">
                         <div class="gallery-preview-wrap" onclick="APP.openMediaPreview('${item.url}')">
                             ${previewContent}

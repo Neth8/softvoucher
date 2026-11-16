@@ -705,6 +705,230 @@ body {
     min-width: 300px;
 }
 
+/* ==========================================================================
+   📱 MOBILE & ANDROID RESPONSIVE DESIGN SYSTEM
+   ========================================================================== */
+
+/* 1. Global Viewport & Android dynamic viewport height adjustments */
+@supports (height: 100dvh) {
+    body, #appContainer, #loginOverlay, #globalLoader {
+        height: 100dvh;
+    }
+}
+
+/* 2. Tablet & Mobile Off-canvas Drawer Navigation (max-width: 991.98px) */
+@media (max-width: 991.98px) {
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        max-width: 82vw;
+        height: 100vh;
+        height: 100dvh;
+        z-index: 1050;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+        box-shadow: none;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: 14px 0 36px rgba(0, 0, 0, 0.42);
+    }
+
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 1045;
+        transition: opacity 0.25s ease;
+    }
+
+    #mainContent {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    .app-topbar {
+        padding: 0 1.25rem;
+    }
+}
+
+/* 3. Mobile Phones & Touch Optimization (max-width: 767.98px) */
+@media (max-width: 767.98px) {
+    /* Prevent auto-zoom on input focus in Android Chrome / iOS Safari */
+    .form-control, .form-select, .input-group-text {
+        font-size: 16px !important;
+    }
+
+    /* Compact viewport padding to maximize screen real estate */
+    .content-viewport {
+        padding: 0.85rem 0.85rem 2.5rem !important;
+    }
+
+    /* Compact topbar */
+    .app-topbar {
+        height: 56px;
+        padding: 0 0.85rem;
+    }
+
+    .topbar-breadcrumb span {
+        font-size: 0.85rem;
+    }
+
+    /* Horizontal scrollable segmented filter pills */
+    .ledger-filter-pills-wrap {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        width: 100%;
+        padding: 4px;
+    }
+    .ledger-filter-pills-wrap::-webkit-scrollbar {
+        display: none;
+    }
+
+    .filter-pill {
+        flex-shrink: 0;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.8rem;
+        min-height: 38px;
+    }
+
+    /* Touch-friendly buttons (minimum touch target ~42px) */
+    .btn {
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-sm {
+        min-height: 34px;
+    }
+
+    .sidebar-nav-btn {
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    /* Responsive tables */
+    .table-responsive {
+        border-radius: 12px;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid var(--border-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .table-custom th {
+        padding: 0.75rem 0.85rem;
+        font-size: 0.68rem;
+    }
+
+    .table-custom td {
+        padding: 0.75rem 0.85rem;
+        font-size: 0.82rem;
+    }
+
+    /* Pagination container wraps cleanly on small screens */
+    #ledgerPaginationControls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Approval Hub Card adjustments for mobile */
+    .approval-card .d-flex.flex-wrap {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .approval-card .d-flex.flex-column.align-items-end {
+        align-items: flex-start !important;
+        width: 100%;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-subtle);
+    }
+
+    .approval-card .d-flex.align-items-center.gap-2 {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .approval-card .d-flex.align-items-center.gap-2 .btn {
+        flex: 1 1 auto;
+    }
+
+    /* File dropzone / upload trigger adjustments */
+    .upload-trigger-box,
+    .file-preview-card {
+        width: 72px;
+        height: 72px;
+    }
+
+    /* Gallery preview adjustments */
+    .gallery-preview-wrap {
+        height: 125px;
+    }
+
+    /* Modal adjustments on mobile */
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+
+    .modal-body {
+        padding: 1.25rem 1rem !important;
+    }
+
+    /* Toast notification positioning */
+    #toastContainer {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+    }
+
+    /* Fullscreen login card on mobile */
+    .login-card {
+        width: 92%;
+        max-width: 380px;
+        margin: 1rem;
+        padding: 1.75rem 1.25rem;
+    }
+}
+
+/* 4. Small Phones (max-width: 480px) */
+@media (max-width: 480px) {
+    .brand-logo {
+        max-width: 150px;
+    }
+
+    .user-email-text {
+        max-width: 160px;
+    }
+
+    .filter-pill {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.75rem;
+    }
+}
+
 /* 🖨️ A4 PRINT RULES */
 @media print {
     body, html {
