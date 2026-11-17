@@ -23,6 +23,13 @@
 
     <!-- 1. FULLSCREEN LOGIN SCREEN -->
     <div id="loginOverlay">
+        <!-- Animated Multi-Color Floating Aurora Orbs -->
+        <div class="login-bg-mesh" aria-hidden="true">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+            <div class="orb orb-4"></div>
+        </div>
         <div class="login-card">
             <div class="text-center mb-4">
                 <img src="https://i.imgur.com/MkCwuBP.png" alt="SoftCreation" class="brand-logo mx-auto mb-3" style="height: 36px;">
@@ -122,18 +129,23 @@
             </nav>
 
             <!-- Bottom Actions -->
-            <div class="pt-3 border-top d-flex gap-2">
-                <button class="btn btn-outline-secondary btn-sm flex-grow-1" id="btnToggleTheme" title="Switch Theme">
-                    <i class="bi bi-moon-stars-fill" id="themeToggleIcon"></i>
-                </button>
-                <button class="btn btn-outline-danger btn-sm flex-grow-1" id="btnLogout" title="Sign Out">
-                    <i class="bi bi-box-arrow-right"></i> Logout
+            <div class="pt-3 border-top">
+                <button class="btn btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-2 btn-sidebar-logout" id="btnLogout" title="Sign Out">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Sign Out</span>
                 </button>
             </div>
         </aside>
 
         <!-- MAIN CONTENT AREA -->
         <main id="mainContent">
+
+            <!-- Ambient Animated Aurora Mesh (Non-distracting, smooth background) -->
+            <div class="ambient-aurora-mesh" aria-hidden="true">
+                <div class="aurora-orb aurora-1"></div>
+                <div class="aurora-orb aurora-2"></div>
+                <div class="aurora-orb aurora-3"></div>
+            </div>
 
             <!-- App Topbar -->
             <header class="app-topbar">
@@ -152,9 +164,8 @@
                         <span class="status-pulse-dot"></span>
                         <span class="small fw-semibold text-muted" style="font-size: 0.72rem;">Supabase Connected</span>
                     </div>
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-2 px-sm-3 d-flex align-items-center gap-1 gap-sm-2" id="btnTopThemeToggle" onclick="APP.toggleTheme()" title="Switch Theme">
+                    <button class="btn btn-icon theme-toggle-btn" id="btnTopThemeToggle" onclick="APP.toggleTheme(event)" title="Toggle Theme" aria-label="Toggle Theme">
                         <i class="bi bi-moon-stars-fill" id="topThemeIcon"></i>
-                        <span class="small fw-semibold d-none d-sm-inline" id="topThemeLabel">Dark Mode</span>
                     </button>
                 </div>
             </header>

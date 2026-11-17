@@ -21,39 +21,117 @@ const APP = {
 
     initTheme() {
         const saved = localStorage.getItem("softcreation_theme_v2") || "light";
-        this.setTheme(saved);
+        this.setTheme(saved, false);
     },
 
-    setTheme(theme) {
+    setTheme(theme, animateIcon = true) {
         this.currentTheme = theme;
         document.documentElement.setAttribute("data-bs-theme", theme);
         localStorage.setItem("softcreation_theme_v2", theme);
 
-        const icon = document.getElementById("themeToggleIcon");
-        if (icon) {
-            icon.className = theme === "dark" ? "bi bi-sun-fill" : "bi bi-moon-stars-fill";
-        }
-
         const topIcon = document.getElementById("topThemeIcon");
-        const topLabel = document.getElementById("topThemeLabel");
         if (topIcon) {
-            topIcon.className = theme === "dark" ? "bi bi-sun-fill" : "bi bi-moon-stars-fill";
-        }
-        if (topLabel) {
-            topLabel.innerText = theme === "dark" ? "Light Mode" : "Dark Mode";
+            if (animateIcon) {
+                topIcon.style.transition = "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease";
+                topIcon.style.transform = "rotate(180deg) scale(0.4)";
+                topIcon.style.opacity = "0.3";
+                setTimeout(() => {
+                    topIcon.className = theme === "dark" ? "bi bi-sun-fill text-warning" : "bi bi-moon-stars-fill text-primary";
+                    topIcon.style.transform = "rotate(0deg) scale(1)";
+                    topIcon.style.opacity = "1";
+                }, 140);
+            } else {
+                topIcon.className = theme === "dark" ? "bi bi-sun-fill text-warning" : "bi bi-moon-stars-fill text-primary";
+            }
         }
     },
 
-    toggleTheme() {
-        const next = this.currentTheme === "dark" ? "light" : "dark";
-        this.setTheme(next);
+    toggleTheme(event) {
+        const nextTheme = this.currentTheme === "dark" ? "light" : "dark";
+
+        // Determine click/touch origin coordinates for Telegram-style circular expansion
+        let x = window.innerWidth / 2;
+        let y = window.innerHeight / 2;
+
+        if (event && typeof event.clientX === "number" && typeof event.clientY === "number") {
+            x = event.clientX;
+            y = event.clientY;
+        } else {
+            const btn = document.getElementById("btnTopThemeToggle");
+            if (btn) {
+                const rect = btn.getBoundingClientRect();
+                x = rect.left + rect.width / 2;
+                y = rect.top + rect.height / 2;
+            }
+        }
+
+        // 1. Native View Transitions API (Chrome, Edge, Safari 18, Chromium Mobile)
+        if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            const endRadius = Math.hypot(
+                Math.max(x, window.innerWidth - x),
+                Math.max(y, window.innerHeight - y)
+            );
+
+            const transition = document.startViewTransition(() => {
+                this.setTheme(nextTheme, true);
+            });
+
+            transition.ready.then(() => {
+                const clipPath = [
+                    `circle(0px at ${x}px ${y}px)`,
+                    `circle(${endRadius}px at ${x}px ${y}px)`
+                ];
+                document.documentElement.animate(
+                    {
+                        clipPath: clipPath
+                    },
+                    {
+                        duration: 520,
+                        easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+                        pseudoElement: "::view-transition-new(root)"
+                    }
+                );
+            });
+        } else {
+            // 2. High-Fidelity Telegram Circular Ripple Fallback (Firefox and other browsers)
+            this.runTelegramCircularOverlay(x, y, nextTheme, () => {
+                this.setTheme(nextTheme, true);
+            });
+        }
+    },
+
+    runTelegramCircularOverlay(x, y, nextTheme, callback) {
+        const ripple = document.createElement("div");
+        ripple.className = "telegram-theme-ripple";
+
+        const maxRadius = Math.hypot(
+            Math.max(x, window.innerWidth - x),
+            Math.max(y, window.innerHeight - y)
+        );
+
+        const diameter = Math.ceil(maxRadius * 2.2);
+        ripple.style.width = `${diameter}px`;
+        ripple.style.height = `${diameter}px`;
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        ripple.style.marginLeft = `${-diameter / 2}px`;
+        ripple.style.marginTop = `${-diameter / 2}px`;
+        // Match AMOLED dark #000000 or clean light #f1f5f9
+        ripple.style.backgroundColor = nextTheme === "dark" ? "#000000" : "#f1f5f9";
+
+        document.body.appendChild(ripple);
+
+        requestAnimationFrame(() => {
+            ripple.classList.add("active");
+            setTimeout(() => {
+                if (callback) callback();
+                ripple.classList.add("fade-out");
+                setTimeout(() => ripple.remove(), 260);
+            }, 320);
+        });
     },
 
     bindGlobalEvents() {
-        // Theme toggle button
-        const themeBtn = document.getElementById("btnToggleTheme");
-        if (themeBtn) themeBtn.addEventListener("click", () => this.toggleTheme());
-
         // Login form
         const loginBtn = document.getElementById("btnLogin");
         if (loginBtn) loginBtn.addEventListener("click", () => this.handleLogin());
